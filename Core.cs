@@ -14,13 +14,50 @@ namespace WorldEditMod
         public override void OnInitializeMelon()
         {
             LoggerInstance.Msg("Initializing...");
-            MelonCoroutines.Start(ModSetup());
+            DivineDinkum.Core.Instance.OnSceneReady.AddListener(OnSceneReady);
+            DivineDinkum.Core.Instance.OnSceneUnready.AddListener(OnSceneUnready);
         }
 
-        private IEnumerator ModSetup()
+        private void OnSceneReady()
         {
-            yield return new WaitUntil(() => DivineDinkum.Core.Instance.IsSetup);
-            LoggerInstance.Msg("DivineDinkum is ready!");
+            MelonCoroutines.Start(SetupMenuScreen());
+        }
+
+        private void OnSceneUnready()
+        {
+
+        }
+
+        private IEnumerator SetupMenuScreen(Action<bool> callback = null)
+        {
+            Transform quitTransform = DivineDinkum.Core.Instance.MenuButtons.transform.Find("Quit To Desktop");
+            if (quitTransform == null)
+            {
+                LoggerInstance.Error("Failed to find Quit button.");
+                callback?.Invoke(false);
+                yield break;
+            }
+            yield return DivineDinkum.Utilities.WaitForGameObject(quitTransform.gameObject);
+
+            Transform quitText = quitTransform.Find("Text");
+            if (quitText == null)
+            {
+                LoggerInstance.Error("Failed to find Text.");
+                callback?.Invoke(false);
+                yield break;
+            }
+            
+            TextMeshProUGUI quitTMP = quitText.GetComponent<TextMeshProUGUI>();
+            if (quitTMP == null)
+            {
+                LoggerInstance.Error("Failed to get TextMeshProUGUI component.");
+                callback?.Invoke(false);
+                yield break;
+            }
+
+            quitTMP.SetText("Kill Game");
+
+            callback(true);
         }
     }
 }
