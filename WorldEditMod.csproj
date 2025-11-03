@@ -417,6 +417,9 @@
 		<Reference Include="0Harmony">
 			<HintPath>D:\Programs\Steam\steamapps\common\Dinkum\MelonLoader\net35\0Harmony.dll</HintPath>
 		</Reference>
+		<Reference Include="DivineDinkum">
+			<HintPath>D:\Programs\Steam\steamapps\common\Dinkum\Plugins\DivineDinkum.dll</HintPath>
+		</Reference>
 
 	</ItemGroup>
 
@@ -427,7 +430,6 @@
 
 	<ItemGroup>
 		<Compile Include="Core.cs" />
-		<Compile Include="Utilities.cs" />
 	</ItemGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
