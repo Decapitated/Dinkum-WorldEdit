@@ -2,7 +2,7 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 [assembly: MelonInfo(typeof(WorldEditMod.Core), "WorldEditMod", "1.0.0", "Decapitated", null)]
 [assembly: MelonGame("James Bendon", "Dinkum")]
@@ -11,16 +11,17 @@ namespace WorldEditMod
 {
     public class Core : MelonMod
     {
+        static public GameObject SquarePrefab { get; private set; }
         public override void OnInitializeMelon()
         {
             LoggerInstance.Msg("Initializing...");
-            DivineDinkum.Core.Instance.OnSceneReady.AddListener(OnSceneReady);
-            DivineDinkum.Core.Instance.OnSceneUnready.AddListener(OnSceneUnready);
+            DivineDinkum.Core.Instance.OnSceneReady.Subscribe(OnSceneReady);
+            DivineDinkum.Core.Instance.OnSceneUnready.Subscribe(OnSceneUnready);
         }
 
         private void OnSceneReady()
         {
-            MelonCoroutines.Start(SetupMenuScreen());
+            MelonCoroutines.Start(Setup());
         }
 
         private void OnSceneUnready()
@@ -28,22 +29,26 @@ namespace WorldEditMod
 
         }
 
-        private IEnumerator SetupMenuScreen(Action<bool> callback = null)
+        private IEnumerator Setup()
         {
-            Transform quitTransform = DivineDinkum.Core.Instance.MenuButtons.transform.Find("Quit To Desktop");
+            yield return SetupMenuScreen();
+            yield return GetMeasurmentSquarePrefab();
+        }
+
+        private IEnumerator SetupMenuScreen()
+        {
+            Transform quitTransform = DivineDinkum.MapCanvas.Instance.MenuButtons.transform.Find("Quit To Desktop");
             if (quitTransform == null)
             {
                 LoggerInstance.Error("Failed to find Quit button.");
-                callback?.Invoke(false);
                 yield break;
             }
-            yield return DivineDinkum.Utilities.WaitForGameObject(quitTransform.gameObject);
+            //yield return new WaitUntil(() => quitTransform.gameObject.activeInHierarchy);
 
             Transform quitText = quitTransform.Find("Text");
             if (quitText == null)
             {
-                LoggerInstance.Error("Failed to find Text.");
-                callback?.Invoke(false);
+                LoggerInstance.Error("Failed to find Text.");;
                 yield break;
             }
             
@@ -51,13 +56,18 @@ namespace WorldEditMod
             if (quitTMP == null)
             {
                 LoggerInstance.Error("Failed to get TextMeshProUGUI component.");
-                callback?.Invoke(false);
                 yield break;
             }
 
             quitTMP.SetText("Kill Game");
-
-            callback(true);
+        }
+    
+        private IEnumerator GetMeasurmentSquarePrefab()
+        {
+            var squarePrefab = DivineDinkum.Utilities.FindResourceObject<GameObject>("MeasurementSquare");
+            //squarePrefab.transform.detach
+            SquarePrefab = GameObject.Instantiate(squarePrefab);
+            yield break;
         }
     }
 }
