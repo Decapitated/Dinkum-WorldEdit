@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace WorldEditMod
 {
-    using static WorldEditMod.Menu;
     using Squares = Dictionary<Vector2Int, TapeMeasureSquare>;
     static internal class Selectors
     {

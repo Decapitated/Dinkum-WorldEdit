@@ -10,7 +10,8 @@ namespace WorldEditMod
         public enum Page
         {
             Main,
-            SelectMode
+            SelectMode,
+            LevelMode
         }
 
         public static void MainWindow(int windowID)
@@ -24,6 +25,9 @@ namespace WorldEditMod
                     break;
                 case Page.SelectMode:
                     SelectModePage(Core.Instance.Data);
+                    break;
+                case Page.LevelMode:
+                    LevelModePage(Core.Instance.Data);
                     break;
             }
 
@@ -57,7 +61,33 @@ namespace WorldEditMod
                 }
                 GUILayout.EndHorizontal();
                 #endregion
-                
+                #region Level Mode
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Level Mode");
+                if (GUILayout.Button(data.levelMode.ToString()))
+                {
+                    data.page = Page.LevelMode;
+                }
+                GUILayout.EndHorizontal();
+                #endregion
+                if (GUILayout.Button("Level"))
+                {
+                    Core.Instance.Level();
+                }
+                #region Adjust
+                Core.Instance.Data.adjustAmount = Mathf.RoundToInt(
+                    GUILayout.HorizontalSlider(Core.Instance.Data.adjustAmount, 1.0f, 10.0f));
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Button("Up"))
+                {
+                    Core.Instance.Up();
+                }
+                if (GUILayout.Button("Down"))
+                {
+                    Core.Instance.Down();
+                }
+                GUILayout.EndHorizontal();
+                #endregion
             }
         }
 
@@ -71,6 +101,18 @@ namespace WorldEditMod
                     data.selectMode = mode;
                     data.page = Page.Main;
                     Core.Instance.Dirty();
+                }
+            }
+        }
+        static void LevelModePage(Data data)
+        {
+            var modes = Enum.GetValues(typeof(Data.LevelMode)).Cast<Data.LevelMode>();
+            foreach (var mode in modes)
+            {
+                if (GUILayout.Button(mode.ToString()))
+                {
+                    data.levelMode = mode;
+                    data.page = Page.Main;
                 }
             }
         }

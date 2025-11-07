@@ -10,6 +10,7 @@ using UnityEngine;
 
 namespace WorldEditMod
 {
+    using static TileTypes;
     using Squares = Dictionary<Vector2Int, TapeMeasureSquare>;
     public class Core : MelonMod
     {
@@ -41,10 +42,15 @@ namespace WorldEditMod
         Rect mainWindowRect;
         public override void OnGUI()
         {
-            mainWindowRect = GUILayout.Window(0,
-                new Rect(Screen.width - Width, Screen.height / 2.0f - Height / 2.0f, Width, Height),
-                Menu.MainWindow,
-                "World Edit");
+            InventorySlot slot = Inventory.Instance.invSlots[Inventory.Instance.selectedSlot];
+            bool holdingTapeMeasure = slot.itemInSlot != null && slot.itemInSlot.name == "Inv_TapeMeasure";
+            if (holdingTapeMeasure || startPosition != null)
+            {
+                mainWindowRect = GUILayout.Window(0,
+                    new Rect(Screen.width - Width, Screen.height / 2.0f - Height / 2.0f, Width, Height),
+                    Menu.MainWindow,
+                    "World Edit");
+            }
         }
 
         void OnSceneReady()
@@ -158,7 +164,8 @@ namespace WorldEditMod
         internal void TransferOrAdd(Squares newSquares, Vector2Int currentTile)
         {
             TapeMeasureSquare newSquare;
-            if (squares.ContainsKey(currentTile))
+            var currentHeight = WorldManager.Instance.heightMap[currentTile.x, currentTile.y];
+            if (squares.ContainsKey(currentTile) && Mathf.Approximately(squares[currentTile].transform.position.y - 0.05f, currentHeight))
             {
                 newSquare = squares[currentTile];
                 squares.Remove(currentTile);
@@ -178,6 +185,8 @@ namespace WorldEditMod
             {
                 if (endPosition == null || isDirty)
                 {
+                    yield return null;
+                    LoggerInstance.Msg("Measurement dirty...");
                     Vector2Int realEndPos;
                     if (endPosition != null)
                     {
@@ -210,9 +219,28 @@ namespace WorldEditMod
             }
         }
         
-        void Level()
+        internal void Level()
         {
+            LoggerInstance.Msg("Level");
+            switch (Data.levelMode)
+            {
+                case Data.LevelMode.Player:
+                    Levelers.Player(squares);
+                    break;
+            }
+            Dirty();
+        }
 
+        internal void Up()
+        {
+            Levelers.Adjust(squares, Data.adjustAmount);
+            Dirty();
+        }
+
+        internal void Down()
+        {
+            Levelers.Adjust(squares, -Data.adjustAmount);
+            Dirty();
         }
     }
 }

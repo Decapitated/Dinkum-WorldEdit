@@ -433,6 +433,7 @@
 		<Compile Include="Core.cs" />
 		<Compile Include="Data.cs" />
 		<Compile Include="Menu.cs" />
+		<Compile Include="Levelers.cs" />
 		<Compile Include="Patches\TapeMeasureManager_useTapeMeasure.cs" />
 		<Compile Include="Selectors.cs" />
 	</ItemGroup>

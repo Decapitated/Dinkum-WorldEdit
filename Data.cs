@@ -26,6 +26,8 @@ namespace WorldEditMod
         public bool toggled = false;
         public SelectMode selectMode = SelectMode.Rectangle;
         public bool ignoreWater = true;
+        public LevelMode levelMode = LevelMode.Player;
+        public int adjustAmount = 1;
 
         public Data() { }
     }
