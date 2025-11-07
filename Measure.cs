@@ -7,6 +7,7 @@ namespace WorldEditMod
     public class Measure
     {
         public bool HoldingTapeMeasure { get; private set; } = false;
+        public bool IsMeasuring { get => startPosition != null; }
 
         internal GameObject SquarePrefab { get; set; } = null;
 
@@ -14,8 +15,6 @@ namespace WorldEditMod
         Vector2Int? startPosition = null;
         Vector2Int? endPosition = null;
         bool isDirty = false;
-
-        public bool IsMeasuring { get => startPosition != null; }
 
         internal void UseCustomTapeMeasure()
         {

@@ -14,10 +14,11 @@ namespace WorldEditMod
     {
         static public Core Instance { get; private set; }
 
-        static public MaterialPropertyBlock MPB { get; private set; }
+        //static public MaterialPropertyBlock MPB { get; private set; }
 
         public bool HoldingTapeMeasure { get; private set; } = false;
         public Measure Measure {  get; private set; } = new Measure();
+
         internal Data Data { get; private set; } = new();
 
         public override void OnInitializeMelon()
