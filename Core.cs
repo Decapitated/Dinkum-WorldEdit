@@ -12,13 +12,37 @@ using Object = UnityEngine.Object;
 
 namespace WorldEditMod
 {
+    using static UnityEngine.Analytics.IAnalytic;
     using Squares = Dictionary<Vector2Int, TapeMeasureSquare>;
     public class Core : MelonMod
     {
+        public enum SelectMode
+        {
+            Rectangle,
+            Circle
+        }
+
+        public class GUIData
+        {
+            public enum Page
+            {
+                Main,
+                SelectMode
+            }
+
+            public bool toggled = false;
+            public SelectMode selectMode = SelectMode.Rectangle;
+            public Page page = Page.Main;
+
+            public GUIData() { }
+        }
+
         static public Core Instance { get; private set; }
 
         static public GameObject SquarePrefab { get; private set; }
         static public MaterialPropertyBlock MPB { get; private set; }
+
+        public GUIData Data { get; private set; } = new ();
 
         public override void OnInitializeMelon()
         {
@@ -35,19 +59,64 @@ namespace WorldEditMod
             }
         }
 
-        private void OnSceneReady()
+        const float Width = 333;
+        const float Height = 666;
+        public override void OnGUI()
+        {
+            GUILayout.BeginArea(new Rect(Screen.width - Width, Screen.height / 2.0f - Height / 2.0f, Width, Height));
+            GUILayout.BeginVertical();
+
+            switch (Data.page)
+            {
+                case GUIData.Page.Main:
+                    MainPage(Data);
+                    break;
+                case GUIData.Page.SelectMode:
+                    SelectModePage(Data);
+                    break;
+            }
+
+            GUILayout.EndVertical();
+            GUILayout.EndArea();
+        }
+
+        void MainPage(GUIData data)
+        {
+            GUILayout.Label("World Edit");
+            data.toggled = GUILayout.Toggle(data.toggled, data.toggled ? "Disable" : "Enable");
+            if (GUILayout.Button(data.selectMode.ToString()))
+            {
+                data.page = GUIData.Page.SelectMode;
+            }
+        }
+
+        void SelectModePage(GUIData data)
+        {
+            var modes = Enum.GetValues(typeof(SelectMode)).Cast<SelectMode>();
+            foreach (var mode in modes)
+            {
+                if (GUILayout.Button(mode.ToString()))
+                {
+                    data.selectMode = mode;
+                    data.page = GUIData.Page.Main;
+                    isDirty = true;
+                }
+            }
+        }
+
+        void OnSceneReady()
         {
             MelonCoroutines.Start(Setup());
         }
 
-        private IEnumerator Setup()
+        IEnumerator Setup()
         {
             SetupMenuScreen();
             GetMeasurmentSquarePrefab();
             yield break;
         }
 
-        private void SetupMenuScreen()
+        void SetupMenuScreen()
         {
             Transform quitTransform = DivineDinkum.MapCanvas.Instance.MenuButtons.transform.Find("Quit To Desktop");
             if (quitTransform == null)
@@ -74,7 +143,7 @@ namespace WorldEditMod
             quitTMP.SetText("Kill Game");
         }
     
-        private void GetMeasurmentSquarePrefab()
+        void GetMeasurmentSquarePrefab()
         {
             var squarePrefab = DivineDinkum.Utilities.FindResourceObject<GameObject>("MeasurementSquare");
             SquarePrefab = GameObject.Instantiate(squarePrefab);
@@ -82,13 +151,6 @@ namespace WorldEditMod
             GameObject.Destroy(squarePrefab.transform.Find("Text (2)"));
         }
 
-        enum SelectMode
-        {
-            Rectangle,
-            Circle
-        }
-
-        SelectMode selectMode = SelectMode.Circle;
         Vector2Int? startPosition = null;
         Vector2Int? endPosition = null;
         Squares squares = new();
@@ -180,7 +242,7 @@ namespace WorldEditMod
                     }
 
                     Squares newSquares = new();
-                    switch (selectMode)
+                    switch (Data.selectMode)
                     {
                         case SelectMode.Rectangle:
                             newSquares = Rectangle((Vector2Int)startPosition, realEndPos);
