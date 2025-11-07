@@ -186,7 +186,6 @@ namespace WorldEditMod
                 if (endPosition == null || isDirty)
                 {
                     yield return null;
-                    LoggerInstance.Msg("Measurement dirty...");
                     Vector2Int realEndPos;
                     if (endPosition != null)
                     {
