@@ -8,7 +8,8 @@ namespace WorldEditMod
         {
             Main,
             SelectMode,
-            LevelMode
+            LevelMode,
+            OperatorMode
         }
 
         public static void MainWindow(int windowID)
@@ -26,6 +27,9 @@ namespace WorldEditMod
                 case Page.LevelMode:
                     LevelModePage(Core.Instance.Data);
                     break;
+                case Page.OperatorMode:
+                    OperatorModePage(Core.Instance.Data);
+                    break;
             }
 
             GUILayout.EndVertical();
@@ -41,14 +45,16 @@ namespace WorldEditMod
             {
                 #region Selection
                 GUILayout.Label("Select");
+
                 // Select Mode Page Toggle
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Mode");
+                GUILayout.Label("Shape");
                 if (GUILayout.Button(data.selectMode.ToString()))
                 {
                     data.page = Page.SelectMode;
                 }
                 GUILayout.EndHorizontal();
+
                 // Ignore Water Toggle
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Ignore Water");
@@ -58,6 +64,16 @@ namespace WorldEditMod
                     Core.Instance.Measure.Dirty();
                 }
                 GUILayout.EndHorizontal();
+
+                // Operator Mode Page Toggle
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Operator");
+                if (GUILayout.Button(data.operatorMode.ToString()))
+                {
+                    data.page = Page.OperatorMode;
+                }
+                GUILayout.EndHorizontal();
+
                 #endregion
                 #region Leveling
                 GUILayout.Label("Level");
@@ -81,14 +97,7 @@ namespace WorldEditMod
                 }
                 if (GUILayout.Button("Level"))
                 {
-                    Core.Instance.Level();
-                }
-                #endregion
-                #region Operations
-                GUILayout.Label("Operations");
-                if (GUILayout.Button("Hollow"))
-                {
-                    data.page = Page.LevelMode;
+                    Levelers.Level();
                 }
                 #endregion
             }
@@ -117,6 +126,20 @@ namespace WorldEditMod
                 {
                     data.levelMode = mode;
                     data.page = Page.Main;
+                }
+            }
+        }
+
+        static void OperatorModePage(Data data)
+        {
+            var modes = Enum.GetValues(typeof(Data.OperatorMode)).Cast<Data.OperatorMode>();
+            foreach (var mode in modes)
+            {
+                if (GUILayout.Button(mode.ToString()))
+                {
+                    data.operatorMode = mode;
+                    data.page = Page.Main;
+                    Core.Instance.Measure.Dirty();
                 }
             }
         }

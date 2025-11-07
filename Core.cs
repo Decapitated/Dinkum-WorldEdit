@@ -1,4 +1,5 @@
 ﻿global using Squares = System.Collections.Generic.Dictionary<UnityEngine.Vector2Int, TapeMeasureSquare>;
+global using Square = System.Collections.Generic.KeyValuePair<UnityEngine.Vector2Int, TapeMeasureSquare>;
 
 using MelonLoader;
 using System.Collections;
@@ -99,30 +100,5 @@ namespace WorldEditMod
             GameObject.Destroy(squarePrefab.transform.Find("Text (2)"));
         }
         #endregion
-
-        internal void Level()
-        {
-            switch (Data.levelMode)
-            {
-                case Data.LevelMode.Player:
-                    Levelers.Player();
-                    break;
-                case Data.LevelMode.Up:
-                case Data.LevelMode.Down:
-                    var diff = Data.adjustAmount * (Data.levelMode == Data.LevelMode.Up ? 1 : -1);
-                    Levelers.Adjust(diff);
-                    break;
-                case Data.LevelMode.Maximum:
-                    Levelers.Maximum();
-                    break;
-                case Data.LevelMode.Minimum:
-                    Levelers.Minimum();
-                    break;
-                case Data.LevelMode.Average:
-                    Levelers.Average();
-                    break;
-            }
-            Measure.Dirty();
-        }
     }
 }

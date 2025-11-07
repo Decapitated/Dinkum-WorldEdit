@@ -4,6 +4,31 @@ namespace WorldEditMod
 {
     static internal class Levelers
     {
+        static public void Level()
+        {
+            switch (Core.Instance.Data.levelMode)
+            {
+                case Data.LevelMode.Player:
+                    Levelers.Player();
+                    break;
+                case Data.LevelMode.Up:
+                case Data.LevelMode.Down:
+                    var diff = Core.Instance.Data.adjustAmount * (Core.Instance.Data.levelMode == Data.LevelMode.Up ? 1 : -1);
+                    Levelers.Adjust(diff);
+                    break;
+                case Data.LevelMode.Maximum:
+                    Levelers.Maximum();
+                    break;
+                case Data.LevelMode.Minimum:
+                    Levelers.Minimum();
+                    break;
+                case Data.LevelMode.Average:
+                    Levelers.Average();
+                    break;
+            }
+            Core.Instance.Measure.Dirty();
+        }
+
         static public void Player()
         {
             var playerPosition = NetworkMapSharer.Instance.localChar.gameObject.transform.position;

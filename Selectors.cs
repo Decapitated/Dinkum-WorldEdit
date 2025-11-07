@@ -7,13 +7,22 @@ namespace WorldEditMod
 {
     static internal class Selectors
     {
-        static bool ShouldSkip(Vector2Int tile)
+        static public Squares Select(Vector2Int startPos, Vector2Int endPos)
         {
-            var isWater = WorldManager.Instance.waterMap[tile.x, tile.y];
-            return (Core.Instance.Data.ignoreWater && isWater);
+            Squares newSquares = [];
+            switch (Core.Instance.Data.selectMode)
+            {
+                case Data.SelectMode.Rectangle:
+                    newSquares = Selectors.Rectangle(startPos, endPos);
+                    break;
+                case Data.SelectMode.Circle:
+                    newSquares = Selectors.Circle(startPos, endPos);
+                    break;
+            }
+            return newSquares;
         }
 
-        static internal Squares Rectangle(Vector2Int startPos, Vector2Int endPos)
+        static Squares Rectangle(Vector2Int startPos, Vector2Int endPos)
         {
             Squares newSquares = [];
             Vector2Int diff = endPos - startPos;
@@ -34,7 +43,7 @@ namespace WorldEditMod
             return newSquares;
         }
 
-        static internal Squares Circle(Vector2Int startPos, Vector2Int endPos)
+        static Squares Circle(Vector2Int startPos, Vector2Int endPos)
         {
             int dx = endPos.x - startPos.x;
             int dy = endPos.y - startPos.y;
@@ -75,5 +84,11 @@ namespace WorldEditMod
             }
             return newSquares;
         }
+        static bool ShouldSkip(Vector2Int tile)
+        {
+            var isWater = WorldManager.Instance.waterMap[tile.x, tile.y];
+            return (Core.Instance.Data.ignoreWater && isWater);
+        }
+
     }
 }

@@ -99,16 +99,10 @@ namespace WorldEditMod
                         realEndPos = new Vector2Int((int)highlightPos.x, (int)highlightPos.z);
                     }
 
-                    Squares newSquares = [];
-                    switch (Core.Instance.Data.selectMode)
-                    {
-                        case Data.SelectMode.Rectangle:
-                            newSquares = Selectors.Rectangle((Vector2Int)startPosition, realEndPos);
-                            break;
-                        case Data.SelectMode.Circle:
-                            newSquares = Selectors.Circle((Vector2Int)startPosition, realEndPos);
-                            break;
-                    }
+                    Squares newSquares = Selectors.Select((Vector2Int)startPosition, realEndPos);
+
+                    Operations.Operate(ref newSquares);
+
                     foreach (var square in squares)
                     {
                         GameObject.Destroy(square.Value.gameObject);

@@ -16,6 +16,12 @@
             Minimum,
             Average
         }
+
+        public enum OperatorMode
+        {
+            None,
+            Hollow
+        }
         
         public Menu.Page page = Menu.Page.Main;
 
@@ -24,6 +30,7 @@
         public bool ignoreWater = true;
         public LevelMode levelMode = LevelMode.Player;
         public int adjustAmount = 1;
+        public OperatorMode operatorMode = OperatorMode.None;
 
         public Data() { }
     }
