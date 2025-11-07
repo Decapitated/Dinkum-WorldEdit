@@ -1,11 +1,7 @@
 ﻿using MelonLoader;
-using Mirror;
-using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Analytics;
-using Object = UnityEngine.Object;
 
 [assembly: MelonInfo(typeof(WorldEditMod.Core), "WorldEditMod", "1.0.0", "Decapitated", null)]
 [assembly: MelonGame("James Bendon", "Dinkum")]
@@ -20,34 +16,53 @@ namespace WorldEditMod
         static public GameObject SquarePrefab { get; private set; }
         static public MaterialPropertyBlock MPB { get; private set; }
 
+        internal Data Data { get; private set; } = new ();
+        bool holdingTapeMeasure = false;
+
         public override void OnInitializeMelon()
         {
-            LoggerInstance.Msg("Initializing...");
             Instance = this;
             DivineDinkum.Core.Instance.OnSceneReady.Subscribe(OnSceneReady);
         }
 
         public override void OnUpdate()
         {
-            if (InputMaster.input.Interact())
+            InventorySlot slot = Inventory.Instance.invSlots[Inventory.Instance.selectedSlot];
+            holdingTapeMeasure = slot.itemInSlot != null && slot.itemInSlot.name == "Inv_TapeMeasure";
+            if (holdingTapeMeasure && InputMaster.input.Interact())
             {
                 ClearMeasurement();
             }
         }
 
-        private void OnSceneReady()
+        const float Width = 333;
+        const float Height = Width * 0.666f;
+
+        Rect mainWindowRect;
+        public override void OnGUI()
+        {
+            if (holdingTapeMeasure || startPosition != null)
+            {
+                mainWindowRect = GUILayout.Window(0,
+                    new Rect(Screen.width - Width, Screen.height / 2.0f - Height / 2.0f, Width, Height),
+                    Menu.MainWindow,
+                    "World Edit");
+            }
+        }
+
+        void OnSceneReady()
         {
             MelonCoroutines.Start(Setup());
         }
 
-        private IEnumerator Setup()
+        IEnumerator Setup()
         {
             SetupMenuScreen();
             GetMeasurmentSquarePrefab();
             yield break;
         }
 
-        private void SetupMenuScreen()
+        void SetupMenuScreen()
         {
             Transform quitTransform = DivineDinkum.MapCanvas.Instance.MenuButtons.transform.Find("Quit To Desktop");
             if (quitTransform == null)
@@ -55,7 +70,6 @@ namespace WorldEditMod
                 LoggerInstance.Error("Failed to find Quit button.");
                 return;
             }
-            //yield return new WaitUntil(() => quitTransform.gameObject.activeInHierarchy);
 
             Transform quitText = quitTransform.Find("Text");
             if (quitText == null)
@@ -73,8 +87,9 @@ namespace WorldEditMod
 
             quitTMP.SetText("Kill Game");
         }
-    
-        private void GetMeasurmentSquarePrefab()
+
+        #region Measuring
+        void GetMeasurmentSquarePrefab()
         {
             var squarePrefab = DivineDinkum.Utilities.FindResourceObject<GameObject>("MeasurementSquare");
             SquarePrefab = GameObject.Instantiate(squarePrefab);
@@ -82,16 +97,9 @@ namespace WorldEditMod
             GameObject.Destroy(squarePrefab.transform.Find("Text (2)"));
         }
 
-        enum SelectMode
-        {
-            Rectangle,
-            Circle
-        }
-
-        SelectMode selectMode = SelectMode.Circle;
         Vector2Int? startPosition = null;
         Vector2Int? endPosition = null;
-        Squares squares = new();
+        Squares squares = [];
         bool isDirty = false;
 
         public bool IsMeasuring
@@ -115,7 +123,6 @@ namespace WorldEditMod
 
         void StartMeasuring(Vector2Int highlightPos)
         {
-            LoggerInstance.Msg("Start measuring...");
             startPosition = highlightPos;
             endPosition = null;
             MelonCoroutines.Start(DoMeasurement());
@@ -123,14 +130,12 @@ namespace WorldEditMod
 
         void StopMeasuring(Vector2Int highlightPos)
         {
-            LoggerInstance.Msg("Stop measuring...");
             endPosition = highlightPos;
-            isDirty = true;
+            Dirty();
         }
 
         void ClearMeasurement()
         {
-            LoggerInstance.Msg("Clear measurement...");
             startPosition = null;
             endPosition = null;
             ClearSquares();
@@ -145,10 +150,16 @@ namespace WorldEditMod
             squares.Clear();
         }
 
-        void TransferOrAdd(Squares newSquares, Vector2Int currentTile)
+        public void Dirty()
+        {
+            isDirty = true;
+        }
+
+        internal void TransferOrAdd(Squares newSquares, Vector2Int currentTile)
         {
             TapeMeasureSquare newSquare;
-            if (squares.ContainsKey(currentTile))
+            var currentHeight = WorldManager.Instance.heightMap[currentTile.x, currentTile.y];
+            if (squares.ContainsKey(currentTile) && Mathf.Approximately(squares[currentTile].transform.position.y - 0.05f, currentHeight))
             {
                 newSquare = squares[currentTile];
                 squares.Remove(currentTile);
@@ -163,11 +174,11 @@ namespace WorldEditMod
 
         IEnumerator DoMeasurement()
         {
-            LoggerInstance.Msg("Do measurement...");
             while (startPosition != null)
             {
                 if (endPosition == null || isDirty)
                 {
+                    yield return null;
                     Vector2Int realEndPos;
                     if (endPosition != null)
                     {
@@ -179,14 +190,14 @@ namespace WorldEditMod
                         realEndPos = new Vector2Int((int)highlightPos.x, (int)highlightPos.z);
                     }
 
-                    Squares newSquares = new();
-                    switch (selectMode)
+                    Squares newSquares = [];
+                    switch (Data.selectMode)
                     {
-                        case SelectMode.Rectangle:
-                            newSquares = Rectangle((Vector2Int)startPosition, realEndPos);
+                        case Data.SelectMode.Rectangle:
+                            newSquares = Selectors.Rectangle((Vector2Int)startPosition, realEndPos);
                             break;
-                        case SelectMode.Circle:
-                            newSquares = Circle((Vector2Int)startPosition, realEndPos);
+                        case Data.SelectMode.Circle:
+                            newSquares = Selectors.Circle((Vector2Int)startPosition, realEndPos);
                             break;
                     }
                     foreach (var square in squares)
@@ -199,60 +210,32 @@ namespace WorldEditMod
                 yield return null;
             }
         }
-
-        Squares Rectangle(Vector2Int startPos, Vector2Int endPos)
+        #endregion
+        #region Leveling
+        internal void Level()
         {
-            Squares newSquares = new();
-            Vector2Int diff = endPos - startPos;
-            int xDir = (int)Mathf.Sign(diff.x);
-            int zDir = (int)Mathf.Sign(diff.y);
-            for (int z = 0; z <= Mathf.Abs(diff.y); z++)
+            switch (Data.levelMode)
             {
-                for (int x = 0; x <= Mathf.Abs(diff.x); x++)
-                {
-                    var currentTile = startPos + new Vector2Int(x * xDir, z * zDir);
-                    TransferOrAdd(newSquares, currentTile);   
-                }
+                case Data.LevelMode.Player:
+                    Levelers.Player(squares);
+                    break;
+                case Data.LevelMode.Up:
+                case Data.LevelMode.Down:
+                    var diff = Data.adjustAmount * (Data.levelMode == Data.LevelMode.Up ? 1 : -1);
+                    Levelers.Adjust(squares, diff);
+                    break;
+                case Data.LevelMode.Maximum:
+                    Levelers.Maximum(squares);
+                    break;
+                case Data.LevelMode.Minimum:
+                    Levelers.Minimum(squares);
+                    break;
+                case Data.LevelMode.Average:
+                    Levelers.Average(squares);
+                    break;
             }
-            return newSquares;
+            Dirty();
         }
-
-        Squares Circle(Vector2Int startPos, Vector2Int endPos)
-        {
-            int dx = endPos.x - startPos.x;
-            int dy = endPos.y - startPos.y;
-
-            int absDx = Mathf.Abs(dx);
-            int absDy = Mathf.Abs(dy);
-
-            // Smoothly blend between average and max distance
-            // - Diagonals get a moderate radius
-            // - Horizontal/vertical lines get full length
-            float blended = (absDx + absDy + Mathf.Max(absDx, absDy)) / 3f;
-
-            // Use the larger of the blended or true Euclidean distance
-            int radius = Mathf.CeilToInt(Mathf.Max(blended, Mathf.Sqrt(dx * dx + dy * dy)));
-
-            // Compute squared radius once
-            int sqrRadius = radius * radius;
-
-            Squares newSquares = new();
-            for (int z = -radius; z <= radius; z++)
-            {
-                for (int x = -radius ; x <= radius; x++)
-                {
-                    int distSqr = x * x + z * z;
-
-                    if (distSqr < sqrRadius)
-                    {
-                        var currentTile = new Vector2Int(
-                            startPos.x + x,
-                            startPos.y + z);
-                        TransferOrAdd(newSquares, currentTile);
-                    }
-                }
-            }
-            return newSquares;
-        }
+        #endregion
     }
 }

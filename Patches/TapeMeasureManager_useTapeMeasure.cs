@@ -21,8 +21,8 @@ namespace WorldEditMod.Patches
             {
                 bool currentlyMeasuring = (bool)CurrentlyMeasuring.GetValue(__instance);
                 bool measurementSaved = (bool)MeasurementSaved.GetValue(__instance);
-                bool isShifting = Input.GetKey(KeyCode.LeftShift);
-                bool shouldBypass = (!currentlyMeasuring && !measurementSaved) && (Core.Instance.IsMeasuring || isShifting);
+
+                bool shouldBypass = (!currentlyMeasuring && !measurementSaved) && (Core.Instance.IsMeasuring || Core.Instance.Data.toggled);
                 if (!shouldBypass)
                 {
                     return true;
