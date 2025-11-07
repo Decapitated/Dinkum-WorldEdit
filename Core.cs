@@ -12,7 +12,6 @@ using Object = UnityEngine.Object;
 
 namespace WorldEditMod
 {
-    using static UnityEngine.Analytics.IAnalytic;
     using Squares = Dictionary<Vector2Int, TapeMeasureSquare>;
     public class Core : MelonMod
     {
@@ -164,7 +163,7 @@ namespace WorldEditMod
             isDirty = true;
         }
 
-        void TransferOrAdd(Squares newSquares, Vector2Int currentTile)
+        internal void TransferOrAdd(Squares newSquares, Vector2Int currentTile)
         {
             TapeMeasureSquare newSquare;
             if (squares.ContainsKey(currentTile))
@@ -202,10 +201,10 @@ namespace WorldEditMod
                     switch (Data.selectMode)
                     {
                         case SelectMode.Rectangle:
-                            newSquares = Rectangle((Vector2Int)startPosition, realEndPos);
+                            newSquares = Selectors.Rectangle((Vector2Int)startPosition, realEndPos);
                             break;
                         case SelectMode.Circle:
-                            newSquares = Circle((Vector2Int)startPosition, realEndPos);
+                            newSquares = Selectors.Circle((Vector2Int)startPosition, realEndPos);
                             break;
                     }
                     foreach (var square in squares)
@@ -217,75 +216,6 @@ namespace WorldEditMod
                 }
                 yield return null;
             }
-        }
-
-        bool ShouldSkip(Vector2Int tile)
-        {
-            var isWater = WorldManager.Instance.waterMap[tile.x, tile.y];
-            return (Data.ignoreWater && isWater);
-        }
-
-        Squares Rectangle(Vector2Int startPos, Vector2Int endPos)
-        {
-            Squares newSquares = new();
-            Vector2Int diff = endPos - startPos;
-            int xDir = (int)Mathf.Sign(diff.x);
-            int zDir = (int)Mathf.Sign(diff.y);
-            for (int z = 0; z <= Mathf.Abs(diff.y); z++)
-            {
-                for (int x = 0; x <= Mathf.Abs(diff.x); x++)
-                {
-                    var currentTile = startPos + new Vector2Int(x * xDir, z * zDir);
-                    if(ShouldSkip(currentTile))
-                    {
-                        continue;
-                    }
-                    TransferOrAdd(newSquares, currentTile);   
-                }
-            }
-            return newSquares;
-        }
-
-        Squares Circle(Vector2Int startPos, Vector2Int endPos)
-        {
-            int dx = endPos.x - startPos.x;
-            int dy = endPos.y - startPos.y;
-
-            int absDx = Mathf.Abs(dx);
-            int absDy = Mathf.Abs(dy);
-
-            // Smoothly blend between average and max distance
-            // - Diagonals get a moderate radius
-            // - Horizontal/vertical lines get full length
-            float blended = (absDx + absDy + Mathf.Max(absDx, absDy)) / 3f;
-
-            // Use the larger of the blended or true Euclidean distance
-            int radius = Mathf.CeilToInt(Mathf.Max(blended, Mathf.Sqrt(dx * dx + dy * dy)));
-
-            // Compute squared radius once
-            int sqrRadius = radius * radius;
-
-            Squares newSquares = new();
-            for (int z = -radius; z <= radius; z++)
-            {
-                for (int x = -radius ; x <= radius; x++)
-                {
-                    int distSqr = x * x + z * z;
-
-                    if (distSqr < sqrRadius)
-                    {
-                        var currentTile = new Vector2Int(
-                            startPos.x + x,
-                            startPos.y + z);
-                        if (ShouldSkip(currentTile))
-                        {
-                            continue;
-                        }
-                        TransferOrAdd(newSquares, currentTile);
-                    }
-                }
-            }
-            return newSquares;
         }
     }
 }
