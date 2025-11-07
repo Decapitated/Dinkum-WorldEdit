@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
-using static UnityEngine.Analytics.IAnalytic;
+﻿using UnityEngine;
 
 namespace WorldEditMod
 {
@@ -43,28 +39,30 @@ namespace WorldEditMod
             }
             if (data.toggled)
             {
-                #region Select Mode Page Toggle
+                #region Selection
+                GUILayout.Label("Select");
+                // Select Mode Page Toggle
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Select Mode");
+                GUILayout.Label("Mode");
                 if (GUILayout.Button(data.selectMode.ToString()))
                 {
                     data.page = Page.SelectMode;
                 }
                 GUILayout.EndHorizontal();
-                #endregion
-                #region Ignore Water Toggle
+                // Ignore Water Toggle
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Ignore Water");
                 if (GUILayout.Button(data.ignoreWater ? "Enabled" : "Disabled"))
                 {
                     data.ignoreWater = !data.ignoreWater;
-                    Core.Instance.Dirty();
+                    Core.Instance.Measure.Dirty();
                 }
                 GUILayout.EndHorizontal();
                 #endregion
                 #region Leveling
+                GUILayout.Label("Level");
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Level Mode");
+                GUILayout.Label("Mode");
                 if (GUILayout.Button(data.levelMode.ToString()))
                 {
                     data.page = Page.LevelMode;
@@ -86,6 +84,13 @@ namespace WorldEditMod
                     Core.Instance.Level();
                 }
                 #endregion
+                #region Operations
+                GUILayout.Label("Operations");
+                if (GUILayout.Button("Hollow"))
+                {
+                    data.page = Page.LevelMode;
+                }
+                #endregion
             }
         }
 
@@ -99,7 +104,7 @@ namespace WorldEditMod
                 {
                     data.selectMode = mode;
                     data.page = Page.Main;
-                    Core.Instance.Dirty();
+                    Core.Instance.Measure.Dirty();
                 }
             }
         }

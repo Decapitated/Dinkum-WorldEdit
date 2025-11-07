@@ -22,7 +22,7 @@ namespace WorldEditMod.Patches
                 bool currentlyMeasuring = (bool)CurrentlyMeasuring.GetValue(__instance);
                 bool measurementSaved = (bool)MeasurementSaved.GetValue(__instance);
 
-                bool shouldBypass = (!currentlyMeasuring && !measurementSaved) && (Core.Instance.IsMeasuring || Core.Instance.Data.toggled);
+                bool shouldBypass = (!currentlyMeasuring && !measurementSaved) && (Core.Instance.Measure.IsMeasuring || Core.Instance.Data.toggled);
                 if (!shouldBypass)
                 {
                     return true;
@@ -34,7 +34,7 @@ namespace WorldEditMod.Patches
                 return true;
             }
 
-            Core.Instance.UseCustomTapeMeasure();
+            Core.Instance.Measure.UseCustomTapeMeasure();
 
             return false;
         }

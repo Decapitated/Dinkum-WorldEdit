@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace WorldEditMod
 {
-    using Squares = Dictionary<Vector2Int, TapeMeasureSquare>;
     static internal class Selectors
     {
         static bool ShouldSkip(Vector2Int tile)
@@ -16,7 +15,7 @@ namespace WorldEditMod
 
         static internal Squares Rectangle(Vector2Int startPos, Vector2Int endPos)
         {
-            Squares newSquares = new();
+            Squares newSquares = [];
             Vector2Int diff = endPos - startPos;
             int xDir = (int)Mathf.Sign(diff.x);
             int zDir = (int)Mathf.Sign(diff.y);
@@ -29,7 +28,7 @@ namespace WorldEditMod
                     {
                         continue;
                     }
-                    Core.Instance.TransferOrAdd(newSquares, currentTile);
+                    Core.Instance.Measure.TransferOrAdd(newSquares, currentTile);
                 }
             }
             return newSquares;
@@ -70,7 +69,7 @@ namespace WorldEditMod
                         {
                             continue;
                         }
-                        Core.Instance.TransferOrAdd(newSquares, currentTile);
+                        Core.Instance.Measure.TransferOrAdd(newSquares, currentTile);
                     }
                 }
             }

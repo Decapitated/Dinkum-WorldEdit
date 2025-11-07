@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using static WorldEditMod.Menu;
-
-namespace WorldEditMod
+﻿namespace WorldEditMod
 {
     internal class Data
     {
@@ -22,7 +17,7 @@ namespace WorldEditMod
             Average
         }
         
-        public Page page = Page.Main;
+        public Menu.Page page = Menu.Page.Main;
 
         public bool toggled = false;
         public SelectMode selectMode = SelectMode.Rectangle;
