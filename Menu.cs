@@ -93,6 +93,7 @@ namespace WorldEditMod
 
         static void SelectModePage(Data data)
         {
+            GUILayout.Label("Choose a Select Mode");
             var modes = Enum.GetValues(typeof(Data.SelectMode)).Cast<Data.SelectMode>();
             foreach (var mode in modes)
             {
