@@ -17,13 +17,13 @@ namespace WorldEditMod.Patches
         static readonly FieldInfo MeasurementSaved = AccessTools.Field(typeof(TapeMeasureManager), "measurementSaved");
         static bool Prefix(ref TapeMeasureManager __instance)
         {
-            Melon<Core>.Logger.Msg("Use tape measure...");
             try
             {
                 bool currentlyMeasuring = (bool)CurrentlyMeasuring.GetValue(__instance);
                 bool measurementSaved = (bool)MeasurementSaved.GetValue(__instance);
                 bool isShifting = Input.GetKey(KeyCode.LeftShift);
-                if (!(isShifting || Core.Instance.IsMeasuring) || currentlyMeasuring || measurementSaved)
+                bool shouldBypass = (!currentlyMeasuring && !measurementSaved) && (Core.Instance.IsMeasuring || isShifting);
+                if (!shouldBypass)
                 {
                     return true;
                 }
