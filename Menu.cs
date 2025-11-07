@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using static UnityEngine.Analytics.IAnalytic;
 
 namespace WorldEditMod
 {
@@ -61,7 +62,7 @@ namespace WorldEditMod
                 }
                 GUILayout.EndHorizontal();
                 #endregion
-                #region Level Mode
+                #region Leveling
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Level Mode");
                 if (GUILayout.Button(data.levelMode.ToString()))
@@ -69,24 +70,21 @@ namespace WorldEditMod
                     data.page = Page.LevelMode;
                 }
                 GUILayout.EndHorizontal();
-                #endregion
+                switch (data.levelMode)
+                {
+                    case Data.LevelMode.Up:
+                    case Data.LevelMode.Down:
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label($"{data.adjustAmount}", GUILayout.ExpandHeight(false));
+                        data.adjustAmount = Mathf.RoundToInt(
+                            GUILayout.HorizontalSlider(data.adjustAmount, 1.0f, 10.0f));
+                        GUILayout.EndHorizontal();
+                        break;
+                }
                 if (GUILayout.Button("Level"))
                 {
                     Core.Instance.Level();
                 }
-                #region Adjust
-                Core.Instance.Data.adjustAmount = Mathf.RoundToInt(
-                    GUILayout.HorizontalSlider(Core.Instance.Data.adjustAmount, 1.0f, 10.0f));
-                GUILayout.BeginHorizontal();
-                if (GUILayout.Button("Up"))
-                {
-                    Core.Instance.Up();
-                }
-                if (GUILayout.Button("Down"))
-                {
-                    Core.Instance.Down();
-                }
-                GUILayout.EndHorizontal();
                 #endregion
             }
         }

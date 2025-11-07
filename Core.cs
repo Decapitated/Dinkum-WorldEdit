@@ -1,6 +1,4 @@
 ﻿using MelonLoader;
-using Mirror;
-using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -10,7 +8,6 @@ using UnityEngine;
 
 namespace WorldEditMod
 {
-    using static TileTypes;
     using Squares = Dictionary<Vector2Int, TapeMeasureSquare>;
     public class Core : MelonMod
     {
@@ -20,6 +17,7 @@ namespace WorldEditMod
         static public MaterialPropertyBlock MPB { get; private set; }
 
         internal Data Data { get; private set; } = new ();
+        bool holdingTapeMeasure = false;
 
         public override void OnInitializeMelon()
         {
@@ -29,7 +27,9 @@ namespace WorldEditMod
 
         public override void OnUpdate()
         {
-            if (InputMaster.input.Interact())
+            InventorySlot slot = Inventory.Instance.invSlots[Inventory.Instance.selectedSlot];
+            holdingTapeMeasure = slot.itemInSlot != null && slot.itemInSlot.name == "Inv_TapeMeasure";
+            if (holdingTapeMeasure && InputMaster.input.Interact())
             {
                 ClearMeasurement();
             }
@@ -41,8 +41,6 @@ namespace WorldEditMod
         Rect mainWindowRect;
         public override void OnGUI()
         {
-            InventorySlot slot = Inventory.Instance.invSlots[Inventory.Instance.selectedSlot];
-            bool holdingTapeMeasure = slot.itemInSlot != null && slot.itemInSlot.name == "Inv_TapeMeasure";
             if (holdingTapeMeasure || startPosition != null)
             {
                 mainWindowRect = GUILayout.Window(0,
@@ -72,7 +70,6 @@ namespace WorldEditMod
                 LoggerInstance.Error("Failed to find Quit button.");
                 return;
             }
-            //yield return new WaitUntil(() => quitTransform.gameObject.activeInHierarchy);
 
             Transform quitText = quitTransform.Find("Text");
             if (quitText == null)
@@ -90,7 +87,8 @@ namespace WorldEditMod
 
             quitTMP.SetText("Kill Game");
         }
-    
+
+        #region Measuring
         void GetMeasurmentSquarePrefab()
         {
             var squarePrefab = DivineDinkum.Utilities.FindResourceObject<GameObject>("MeasurementSquare");
@@ -101,7 +99,7 @@ namespace WorldEditMod
 
         Vector2Int? startPosition = null;
         Vector2Int? endPosition = null;
-        Squares squares = new();
+        Squares squares = [];
         bool isDirty = false;
 
         public bool IsMeasuring
@@ -192,7 +190,7 @@ namespace WorldEditMod
                         realEndPos = new Vector2Int((int)highlightPos.x, (int)highlightPos.z);
                     }
 
-                    Squares newSquares = new();
+                    Squares newSquares = [];
                     switch (Data.selectMode)
                     {
                         case Data.SelectMode.Rectangle:
@@ -212,7 +210,8 @@ namespace WorldEditMod
                 yield return null;
             }
         }
-        
+        #endregion
+        #region Leveling
         internal void Level()
         {
             switch (Data.levelMode)
@@ -220,20 +219,23 @@ namespace WorldEditMod
                 case Data.LevelMode.Player:
                     Levelers.Player(squares);
                     break;
+                case Data.LevelMode.Up:
+                case Data.LevelMode.Down:
+                    var diff = Data.adjustAmount * (Data.levelMode == Data.LevelMode.Up ? 1 : -1);
+                    Levelers.Adjust(squares, diff);
+                    break;
+                case Data.LevelMode.Maximum:
+                    Levelers.Maximum(squares);
+                    break;
+                case Data.LevelMode.Minimum:
+                    Levelers.Minimum(squares);
+                    break;
+                case Data.LevelMode.Average:
+                    Levelers.Average(squares);
+                    break;
             }
             Dirty();
         }
-
-        internal void Up()
-        {
-            Levelers.Adjust(squares, Data.adjustAmount);
-            Dirty();
-        }
-
-        internal void Down()
-        {
-            Levelers.Adjust(squares, -Data.adjustAmount);
-            Dirty();
-        }
+        #endregion
     }
 }

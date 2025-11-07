@@ -16,6 +16,7 @@ namespace WorldEditMod
         public enum LevelMode
         {
             Player,
+            Up, Down,
             Maximum,
             Minimum,
             Average
