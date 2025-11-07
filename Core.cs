@@ -60,10 +60,19 @@ namespace WorldEditMod
         }
 
         const float Width = 333;
-        const float Height = 666;
+        const float Height = Width * 0.666f;
+
+        Rect mainWindowRect;
         public override void OnGUI()
         {
-            GUILayout.BeginArea(new Rect(Screen.width - Width, Screen.height / 2.0f - Height / 2.0f, Width, Height));
+            mainWindowRect = GUILayout.Window(0,
+                new Rect(Screen.width - Width, Screen.height / 2.0f - Height / 2.0f, Width, Height),
+                MainWindow,
+                "World Edit");
+        }
+
+        void MainWindow(int windowID)
+        {
             GUILayout.BeginVertical();
 
             switch (Data.page)
@@ -77,16 +86,21 @@ namespace WorldEditMod
             }
 
             GUILayout.EndVertical();
-            GUILayout.EndArea();
         }
 
         void MainPage(GUIData data)
         {
-            GUILayout.Label("World Edit");
-            data.toggled = GUILayout.Toggle(data.toggled, data.toggled ? "Disable" : "Enable");
-            if (GUILayout.Button(data.selectMode.ToString()))
+            if (GUILayout.Button(data.toggled ? "Disable" : "Enable"))
             {
-                data.page = GUIData.Page.SelectMode;
+                data.toggled = !data.toggled;
+            }
+            if (data.toggled)
+            {
+                GUILayout.Label("Select Mode");
+                if (GUILayout.Button(data.selectMode.ToString()))
+                {
+                    data.page = GUIData.Page.SelectMode;
+                }
             }
         }
 
