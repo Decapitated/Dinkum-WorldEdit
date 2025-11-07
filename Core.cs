@@ -4,8 +4,6 @@ using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Analytics;
-using Object = UnityEngine.Object;
 
 [assembly: MelonInfo(typeof(WorldEditMod.Core), "WorldEditMod", "1.0.0", "Decapitated", null)]
 [assembly: MelonGame("James Bendon", "Dinkum")]
@@ -15,18 +13,12 @@ namespace WorldEditMod
     using Squares = Dictionary<Vector2Int, TapeMeasureSquare>;
     public class Core : MelonMod
     {
-        public enum SelectMode
-        {
-            Rectangle,
-            Circle
-        }
-
         static public Core Instance { get; private set; }
 
         static public GameObject SquarePrefab { get; private set; }
         static public MaterialPropertyBlock MPB { get; private set; }
 
-        internal Menu.Data Data { get; private set; } = new ();
+        internal Data Data { get; private set; } = new ();
 
         public override void OnInitializeMelon()
         {
@@ -200,10 +192,10 @@ namespace WorldEditMod
                     Squares newSquares = new();
                     switch (Data.selectMode)
                     {
-                        case SelectMode.Rectangle:
+                        case Data.SelectMode.Rectangle:
                             newSquares = Selectors.Rectangle((Vector2Int)startPosition, realEndPos);
                             break;
-                        case SelectMode.Circle:
+                        case Data.SelectMode.Circle:
                             newSquares = Selectors.Circle((Vector2Int)startPosition, realEndPos);
                             break;
                     }
@@ -216,6 +208,11 @@ namespace WorldEditMod
                 }
                 yield return null;
             }
+        }
+        
+        void Level()
+        {
+
         }
     }
 }
