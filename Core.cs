@@ -22,27 +22,12 @@ namespace WorldEditMod
             Circle
         }
 
-        public class GUIData
-        {
-            public enum Page
-            {
-                Main,
-                SelectMode
-            }
-
-            public bool toggled = false;
-            public SelectMode selectMode = SelectMode.Rectangle;
-            public Page page = Page.Main;
-
-            public GUIData() { }
-        }
-
         static public Core Instance { get; private set; }
 
         static public GameObject SquarePrefab { get; private set; }
         static public MaterialPropertyBlock MPB { get; private set; }
 
-        public GUIData Data { get; private set; } = new ();
+        internal Menu.Data Data { get; private set; } = new ();
 
         public override void OnInitializeMelon()
         {
@@ -67,55 +52,8 @@ namespace WorldEditMod
         {
             mainWindowRect = GUILayout.Window(0,
                 new Rect(Screen.width - Width, Screen.height / 2.0f - Height / 2.0f, Width, Height),
-                MainWindow,
+                Menu.MainWindow,
                 "World Edit");
-        }
-
-        void MainWindow(int windowID)
-        {
-            GUILayout.BeginVertical();
-
-            switch (Data.page)
-            {
-                case GUIData.Page.Main:
-                    MainPage(Data);
-                    break;
-                case GUIData.Page.SelectMode:
-                    SelectModePage(Data);
-                    break;
-            }
-
-            GUILayout.EndVertical();
-        }
-
-        void MainPage(GUIData data)
-        {
-            if (GUILayout.Button(data.toggled ? "Disable" : "Enable"))
-            {
-                data.toggled = !data.toggled;
-            }
-            if (data.toggled)
-            {
-                GUILayout.Label("Select Mode");
-                if (GUILayout.Button(data.selectMode.ToString()))
-                {
-                    data.page = GUIData.Page.SelectMode;
-                }
-            }
-        }
-
-        void SelectModePage(GUIData data)
-        {
-            var modes = Enum.GetValues(typeof(SelectMode)).Cast<SelectMode>();
-            foreach (var mode in modes)
-            {
-                if (GUILayout.Button(mode.ToString()))
-                {
-                    data.selectMode = mode;
-                    data.page = GUIData.Page.Main;
-                    isDirty = true;
-                }
-            }
         }
 
         void OnSceneReady()
@@ -201,7 +139,7 @@ namespace WorldEditMod
         {
             LoggerInstance.Msg("Stop measuring...");
             endPosition = highlightPos;
-            isDirty = true;
+            Dirty();
         }
 
         void ClearMeasurement()
@@ -219,6 +157,11 @@ namespace WorldEditMod
                 GameObject.Destroy(square.Value.gameObject);
             }
             squares.Clear();
+        }
+
+        public void Dirty()
+        {
+            isDirty = true;
         }
 
         void TransferOrAdd(Squares newSquares, Vector2Int currentTile)
@@ -276,6 +219,12 @@ namespace WorldEditMod
             }
         }
 
+        bool ShouldSkip(Vector2Int tile)
+        {
+            var isWater = WorldManager.Instance.waterMap[tile.x, tile.y];
+            return (Data.ignoreWater && isWater);
+        }
+
         Squares Rectangle(Vector2Int startPos, Vector2Int endPos)
         {
             Squares newSquares = new();
@@ -287,6 +236,10 @@ namespace WorldEditMod
                 for (int x = 0; x <= Mathf.Abs(diff.x); x++)
                 {
                     var currentTile = startPos + new Vector2Int(x * xDir, z * zDir);
+                    if(ShouldSkip(currentTile))
+                    {
+                        continue;
+                    }
                     TransferOrAdd(newSquares, currentTile);   
                 }
             }
@@ -324,6 +277,10 @@ namespace WorldEditMod
                         var currentTile = new Vector2Int(
                             startPos.x + x,
                             startPos.y + z);
+                        if (ShouldSkip(currentTile))
+                        {
+                            continue;
+                        }
                         TransferOrAdd(newSquares, currentTile);
                     }
                 }
