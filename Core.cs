@@ -103,10 +103,6 @@ namespace WorldEditMod
         {
             var highlightPos = DivineDinkum.Utilities.GetHighlighterPosition();
             var highlightPos2D = new Vector2Int((int)highlightPos.x, (int)highlightPos.z);
-            LoggerInstance.Msg(
-                "\n Highlight \n" +
-                "===========\n" +
-                $"Pos: {highlightPos2D}");
             if (startPosition == null)
             {
                 StartMeasuring(highlightPos2D);
@@ -247,7 +243,7 @@ namespace WorldEditMod
                 {
                     int distSqr = x * x + z * z;
 
-                    if (distSqr <= sqrRadius)
+                    if (distSqr < sqrRadius)
                     {
                         var currentTile = new Vector2Int(
                             startPos.x + x,
