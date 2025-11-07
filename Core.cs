@@ -23,7 +23,6 @@ namespace WorldEditMod
 
         public override void OnInitializeMelon()
         {
-            LoggerInstance.Msg("Initializing...");
             Instance = this;
             DivineDinkum.Core.Instance.OnSceneReady.Subscribe(OnSceneReady);
         }
@@ -126,7 +125,6 @@ namespace WorldEditMod
 
         void StartMeasuring(Vector2Int highlightPos)
         {
-            LoggerInstance.Msg("Start measuring...");
             startPosition = highlightPos;
             endPosition = null;
             MelonCoroutines.Start(DoMeasurement());
@@ -134,14 +132,12 @@ namespace WorldEditMod
 
         void StopMeasuring(Vector2Int highlightPos)
         {
-            LoggerInstance.Msg("Stop measuring...");
             endPosition = highlightPos;
             Dirty();
         }
 
         void ClearMeasurement()
         {
-            LoggerInstance.Msg("Clear measurement...");
             startPosition = null;
             endPosition = null;
             ClearSquares();
@@ -180,7 +176,6 @@ namespace WorldEditMod
 
         IEnumerator DoMeasurement()
         {
-            LoggerInstance.Msg("Do measurement...");
             while (startPosition != null)
             {
                 if (endPosition == null || isDirty)
@@ -220,7 +215,6 @@ namespace WorldEditMod
         
         internal void Level()
         {
-            LoggerInstance.Msg("Level");
             switch (Data.levelMode)
             {
                 case Data.LevelMode.Player:
