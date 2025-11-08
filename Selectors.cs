@@ -5,18 +5,26 @@ using UnityEngine;
 
 namespace WorldEditMod
 {
-    using Squares = Dictionary<Vector2Int, TapeMeasureSquare>;
     static internal class Selectors
     {
-        static bool ShouldSkip(Vector2Int tile)
+        static public Squares Select(Vector2Int startPos, Vector2Int endPos)
         {
-            var isWater = WorldManager.Instance.waterMap[tile.x, tile.y];
-            return (Core.Instance.Data.ignoreWater && isWater);
+            Squares newSquares = [];
+            switch (Core.Instance.Data.selectMode)
+            {
+                case Data.SelectMode.Rectangle:
+                    newSquares = Selectors.Rectangle(startPos, endPos);
+                    break;
+                case Data.SelectMode.Circle:
+                    newSquares = Selectors.Circle(startPos, endPos);
+                    break;
+            }
+            return newSquares;
         }
 
-        static internal Squares Rectangle(Vector2Int startPos, Vector2Int endPos)
+        static Squares Rectangle(Vector2Int startPos, Vector2Int endPos)
         {
-            Squares newSquares = new();
+            Squares newSquares = [];
             Vector2Int diff = endPos - startPos;
             int xDir = (int)Mathf.Sign(diff.x);
             int zDir = (int)Mathf.Sign(diff.y);
@@ -29,13 +37,13 @@ namespace WorldEditMod
                     {
                         continue;
                     }
-                    Core.Instance.TransferOrAdd(newSquares, currentTile);
+                    Core.Instance.Measure.TransferOrAdd(newSquares, currentTile);
                 }
             }
             return newSquares;
         }
 
-        static internal Squares Circle(Vector2Int startPos, Vector2Int endPos)
+        static Squares Circle(Vector2Int startPos, Vector2Int endPos)
         {
             int dx = endPos.x - startPos.x;
             int dy = endPos.y - startPos.y;
@@ -70,11 +78,41 @@ namespace WorldEditMod
                         {
                             continue;
                         }
-                        Core.Instance.TransferOrAdd(newSquares, currentTile);
+                        Core.Instance.Measure.TransferOrAdd(newSquares, currentTile);
                     }
                 }
             }
             return newSquares;
         }
+        static bool ShouldSkip(Vector2Int tile)
+        {
+            var isWater = WorldManager.Instance.waterMap[tile.x, tile.y];
+
+            var startY = WorldManager.Instance.heightMap[Core.Instance.Measure.StartPosition.Value.x, Core.Instance.Measure.StartPosition.Value.y];
+            var tileY = WorldManager.Instance.heightMap[tile.x, tile.y];
+            var yDiff = tileY - startY;
+            var isValidY = true;
+            switch (Core.Instance.Data.limitYMode)
+            {
+                case Data.LimitYMode.Same:
+                    isValidY = yDiff == 0;
+                    break;
+                case Data.LimitYMode.Less:
+                    isValidY = yDiff < 0;
+                    break;
+                case Data.LimitYMode.LessOrSame:
+                    isValidY = yDiff <= 0;
+                    break;
+                case Data.LimitYMode.Greater:
+                    isValidY = yDiff > 0;
+                    break;
+                case Data.LimitYMode.GreaterOrSame:
+                    isValidY = yDiff >= 0;
+                    break;
+            }
+
+            return (Core.Instance.Data.ignoreWater && isWater) || !isValidY;
+        }
+
     }
 }

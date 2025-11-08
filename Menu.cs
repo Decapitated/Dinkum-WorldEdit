@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
-using static UnityEngine.Analytics.IAnalytic;
+﻿using UnityEngine;
 
 namespace WorldEditMod
 {
@@ -12,7 +8,9 @@ namespace WorldEditMod
         {
             Main,
             SelectMode,
-            LevelMode
+            LevelMode,
+            OperatorMode,
+            LimitYMode
         }
 
         public static void MainWindow(int windowID)
@@ -30,6 +28,12 @@ namespace WorldEditMod
                 case Page.LevelMode:
                     LevelModePage(Core.Instance.Data);
                     break;
+                case Page.OperatorMode:
+                    OperatorModePage(Core.Instance.Data);
+                    break;
+                case Page.LimitYMode:
+                    LimitYModePage(Core.Instance.Data);
+                    break;
             }
 
             GUILayout.EndVertical();
@@ -43,28 +47,51 @@ namespace WorldEditMod
             }
             if (data.toggled)
             {
-                #region Select Mode Page Toggle
+                #region Selection
+                GUILayout.Label("Select");
+
+                // Select Mode Page Toggle
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Select Mode");
+                GUILayout.Label("Shape");
                 if (GUILayout.Button(data.selectMode.ToString()))
                 {
                     data.page = Page.SelectMode;
                 }
                 GUILayout.EndHorizontal();
-                #endregion
-                #region Ignore Water Toggle
+
+                // Ignore Water Toggle
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Ignore Water");
                 if (GUILayout.Button(data.ignoreWater ? "Enabled" : "Disabled"))
                 {
                     data.ignoreWater = !data.ignoreWater;
-                    Core.Instance.Dirty();
+                    Core.Instance.Measure.Dirty();
                 }
                 GUILayout.EndHorizontal();
+
+                // Operator Mode Page Toggle
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Operator");
+                if (GUILayout.Button(data.operatorMode.ToString()))
+                {
+                    data.page = Page.OperatorMode;
+                }
+                GUILayout.EndHorizontal();
+
+                // Limit Y Mode Page Toggle
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Y Limit");
+                if (GUILayout.Button(data.limitYMode.ToString()))
+                {
+                    data.page = Page.LimitYMode;
+                }
+                GUILayout.EndHorizontal();
+
                 #endregion
                 #region Leveling
+                GUILayout.Label("Level");
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Level Mode");
+                GUILayout.Label("Mode");
                 if (GUILayout.Button(data.levelMode.ToString()))
                 {
                     data.page = Page.LevelMode;
@@ -83,7 +110,7 @@ namespace WorldEditMod
                 }
                 if (GUILayout.Button("Level"))
                 {
-                    Core.Instance.Level();
+                    Levelers.Level();
                 }
                 #endregion
             }
@@ -91,7 +118,7 @@ namespace WorldEditMod
 
         static void SelectModePage(Data data)
         {
-            GUILayout.Label("Choose a Select Mode");
+            GUILayout.Label("Choose a Select Shape");
             var modes = Enum.GetValues(typeof(Data.SelectMode)).Cast<Data.SelectMode>();
             foreach (var mode in modes)
             {
@@ -99,12 +126,13 @@ namespace WorldEditMod
                 {
                     data.selectMode = mode;
                     data.page = Page.Main;
-                    Core.Instance.Dirty();
+                    Core.Instance.Measure.Dirty();
                 }
             }
         }
         static void LevelModePage(Data data)
         {
+            GUILayout.Label("Choose a Leveling Mode");
             var modes = Enum.GetValues(typeof(Data.LevelMode)).Cast<Data.LevelMode>();
             foreach (var mode in modes)
             {
@@ -112,6 +140,35 @@ namespace WorldEditMod
                 {
                     data.levelMode = mode;
                     data.page = Page.Main;
+                }
+            }
+        }
+
+        static void OperatorModePage(Data data)
+        {
+            GUILayout.Label("Choose an Operation");
+            var modes = Enum.GetValues(typeof(Data.OperatorMode)).Cast<Data.OperatorMode>();
+            foreach (var mode in modes)
+            {
+                if (GUILayout.Button(mode.ToString()))
+                {
+                    data.operatorMode = mode;
+                    data.page = Page.Main;
+                    Core.Instance.Measure.Dirty();
+                }
+            }
+        }
+        static void LimitYModePage(Data data)
+        {
+            GUILayout.Label("Choose a Limit Y Mode");
+            var modes = Enum.GetValues(typeof(Data.LimitYMode)).Cast<Data.LimitYMode>();
+            foreach (var mode in modes)
+            {
+                if (GUILayout.Button(mode.ToString()))
+                {
+                    data.limitYMode = mode;
+                    data.page = Page.Main;
+                    Core.Instance.Measure.Dirty();
                 }
             }
         }
