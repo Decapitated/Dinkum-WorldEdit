@@ -20,12 +20,13 @@ namespace WorldEditMod
         public bool HoldingTapeMeasure { get; private set; } = false;
         public Measure Measure {  get; private set; } = new Measure();
 
-        internal Data Data { get; private set; } = new();
+        internal Data Data { get; private set; }
 
         public override void OnInitializeMelon()
         {
             Instance = this;
             DivineDinkum.Core.Instance.OnSceneReady.Subscribe(OnSceneReady);
+            DivineDinkum.Core.Instance.OnSceneUnready.Subscribe(OnSceneUnready);
         }
 
         public override void OnUpdate()
@@ -39,7 +40,7 @@ namespace WorldEditMod
         }
 
         const float Width = 333;
-        const float Height = Width * 1.333f;
+        const float Height = Width * 1.0f;
 
         Rect mainWindowRect;
         public override void OnGUI()
@@ -56,7 +57,13 @@ namespace WorldEditMod
         #region Setup
         void OnSceneReady()
         {
+            Data = new();
             MelonCoroutines.Start(Setup());
+        }
+
+        void OnSceneUnready()
+        {
+            Measure.ClearMeasurement();
         }
 
         IEnumerator Setup()

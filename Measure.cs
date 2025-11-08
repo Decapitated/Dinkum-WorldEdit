@@ -54,7 +54,10 @@ namespace WorldEditMod
         {
             foreach (var square in squares)
             {
-                GameObject.Destroy(square.Value.gameObject);
+                if (square.Value != null)
+                {
+                    GameObject.Destroy(square.Value.gameObject);
+                }
             }
             squares.Clear();
         }
