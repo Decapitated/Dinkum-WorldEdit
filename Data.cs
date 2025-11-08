@@ -23,6 +23,16 @@
             Hollow
         }
         
+        public enum LimitYMode
+        {
+            None,
+            Same,
+            Less,
+            LessOrSame,
+            Greater,
+            GreaterOrSame
+        }
+
         public Menu.Page page = Menu.Page.Main;
 
         public bool toggled = false;
@@ -31,6 +41,7 @@
         public LevelMode levelMode = LevelMode.Player;
         public int adjustAmount = 1;
         public OperatorMode operatorMode = OperatorMode.None;
+        public LimitYMode limitYMode = LimitYMode.None;
 
         public Data() { }
     }

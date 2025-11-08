@@ -87,7 +87,31 @@ namespace WorldEditMod
         static bool ShouldSkip(Vector2Int tile)
         {
             var isWater = WorldManager.Instance.waterMap[tile.x, tile.y];
-            return (Core.Instance.Data.ignoreWater && isWater);
+
+            var startY = WorldManager.Instance.heightMap[Core.Instance.Measure.StartPosition.Value.x, Core.Instance.Measure.StartPosition.Value.y];
+            var tileY = WorldManager.Instance.heightMap[tile.x, tile.y];
+            var yDiff = tileY - startY;
+            var isValidY = true;
+            switch (Core.Instance.Data.limitYMode)
+            {
+                case Data.LimitYMode.Same:
+                    isValidY = yDiff == 0;
+                    break;
+                case Data.LimitYMode.Less:
+                    isValidY = yDiff < 0;
+                    break;
+                case Data.LimitYMode.LessOrSame:
+                    isValidY = yDiff <= 0;
+                    break;
+                case Data.LimitYMode.Greater:
+                    isValidY = yDiff > 0;
+                    break;
+                case Data.LimitYMode.GreaterOrSame:
+                    isValidY = yDiff >= 0;
+                    break;
+            }
+
+            return (Core.Instance.Data.ignoreWater && isWater) || !isValidY;
         }
 
     }

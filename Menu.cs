@@ -9,7 +9,8 @@ namespace WorldEditMod
             Main,
             SelectMode,
             LevelMode,
-            OperatorMode
+            OperatorMode,
+            LimitYMode
         }
 
         public static void MainWindow(int windowID)
@@ -29,6 +30,9 @@ namespace WorldEditMod
                     break;
                 case Page.OperatorMode:
                     OperatorModePage(Core.Instance.Data);
+                    break;
+                case Page.LimitYMode:
+                    LimitYModePage(Core.Instance.Data);
                     break;
             }
 
@@ -74,6 +78,15 @@ namespace WorldEditMod
                 }
                 GUILayout.EndHorizontal();
 
+                // Limit Y Mode Page Toggle
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Y Limit");
+                if (GUILayout.Button(data.limitYMode.ToString()))
+                {
+                    data.page = Page.LimitYMode;
+                }
+                GUILayout.EndHorizontal();
+
                 #endregion
                 #region Leveling
                 GUILayout.Label("Level");
@@ -105,7 +118,7 @@ namespace WorldEditMod
 
         static void SelectModePage(Data data)
         {
-            GUILayout.Label("Choose a Select Mode");
+            GUILayout.Label("Choose a Select Shape");
             var modes = Enum.GetValues(typeof(Data.SelectMode)).Cast<Data.SelectMode>();
             foreach (var mode in modes)
             {
@@ -119,6 +132,7 @@ namespace WorldEditMod
         }
         static void LevelModePage(Data data)
         {
+            GUILayout.Label("Choose a Leveling Mode");
             var modes = Enum.GetValues(typeof(Data.LevelMode)).Cast<Data.LevelMode>();
             foreach (var mode in modes)
             {
@@ -132,12 +146,27 @@ namespace WorldEditMod
 
         static void OperatorModePage(Data data)
         {
+            GUILayout.Label("Choose an Operation");
             var modes = Enum.GetValues(typeof(Data.OperatorMode)).Cast<Data.OperatorMode>();
             foreach (var mode in modes)
             {
                 if (GUILayout.Button(mode.ToString()))
                 {
                     data.operatorMode = mode;
+                    data.page = Page.Main;
+                    Core.Instance.Measure.Dirty();
+                }
+            }
+        }
+        static void LimitYModePage(Data data)
+        {
+            GUILayout.Label("Choose a Limit Y Mode");
+            var modes = Enum.GetValues(typeof(Data.LimitYMode)).Cast<Data.LimitYMode>();
+            foreach (var mode in modes)
+            {
+                if (GUILayout.Button(mode.ToString()))
+                {
+                    data.limitYMode = mode;
                     data.page = Page.Main;
                     Core.Instance.Measure.Dirty();
                 }

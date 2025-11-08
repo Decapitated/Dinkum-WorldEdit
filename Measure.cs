@@ -7,24 +7,24 @@ namespace WorldEditMod
     public class Measure
     {
         public bool HoldingTapeMeasure { get; private set; } = false;
-        public bool IsMeasuring { get => startPosition != null; }
+        public bool IsMeasuring { get => StartPosition != null; }
 
         internal GameObject SquarePrefab { get; set; } = null;
 
         internal Squares squares = [];
-        Vector2Int? startPosition = null;
-        Vector2Int? endPosition = null;
+        internal Vector2Int? StartPosition { get; private set; } = null;
+        internal Vector2Int? EndPosition { get; private set; } = null;
         bool isDirty = false;
 
         internal void UseCustomTapeMeasure()
         {
             var highlightPos = DivineDinkum.Utilities.GetHighlighterPosition();
             var highlightPos2D = new Vector2Int((int)highlightPos.x, (int)highlightPos.z);
-            if (startPosition == null)
+            if (StartPosition == null)
             {
                 StartMeasuring(highlightPos2D);
             }
-            else if (endPosition == null)
+            else if (EndPosition == null)
             {
                 StopMeasuring(highlightPos2D);
             }
@@ -32,21 +32,21 @@ namespace WorldEditMod
 
         void StartMeasuring(Vector2Int highlightPos)
         {
-            startPosition = highlightPos;
-            endPosition = null;
+            StartPosition = highlightPos;
+            EndPosition = null;
             MelonCoroutines.Start(DoMeasurement());
         }
 
         void StopMeasuring(Vector2Int highlightPos)
         {
-            endPosition = highlightPos;
+            EndPosition = highlightPos;
             Dirty();
         }
 
         internal void ClearMeasurement()
         {
-            startPosition = null;
-            endPosition = null;
+            StartPosition = null;
+            EndPosition = null;
             ClearSquares();
         }
 
@@ -83,15 +83,15 @@ namespace WorldEditMod
 
         IEnumerator DoMeasurement()
         {
-            while (startPosition != null)
+            while (StartPosition != null)
             {
-                if (endPosition == null || isDirty)
+                if (EndPosition == null || isDirty)
                 {
                     yield return null;
                     Vector2Int realEndPos;
-                    if (endPosition != null)
+                    if (EndPosition != null)
                     {
-                        realEndPos = (Vector2Int)endPosition;
+                        realEndPos = (Vector2Int)EndPosition;
                     }
                     else
                     {
@@ -99,7 +99,7 @@ namespace WorldEditMod
                         realEndPos = new Vector2Int((int)highlightPos.x, (int)highlightPos.z);
                     }
 
-                    Squares newSquares = Selectors.Select((Vector2Int)startPosition, realEndPos);
+                    Squares newSquares = Selectors.Select((Vector2Int)StartPosition, realEndPos);
 
                     Operations.Operate(ref newSquares);
 
