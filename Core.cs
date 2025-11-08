@@ -94,10 +94,13 @@ namespace WorldEditMod
 
         void GetMeasurmentSquarePrefab()
         {
-            var squarePrefab = DivineDinkum.Utilities.FindResourceObject<GameObject>("MeasurementSquare");
-            Measure.SquarePrefab = GameObject.Instantiate(squarePrefab);
-            GameObject.Destroy(squarePrefab.transform.Find("Text (1)"));
-            GameObject.Destroy(squarePrefab.transform.Find("Text (2)"));
+            if (Measure.SquarePrefab == null)
+            {
+                var squarePrefab = DivineDinkum.Utilities.FindResourceObject<GameObject>("MeasurementSquare");
+                Measure.SquarePrefab = GameObject.Instantiate(squarePrefab);
+                GameObject.Destroy(squarePrefab.transform.Find("Text (1)"));
+                GameObject.Destroy(squarePrefab.transform.Find("Text (2)"));
+            }
         }
         #endregion
     }
