@@ -8,51 +8,34 @@ namespace WorldEditMod
 {
     static internal class Operations
     {
-        static public void Operate(ref Squares newSquares)
+        static public void Operate(ref List<Vector2Int> selection)
         {
             if (Core.Instance.Data.operatorMode == Data.OperatorMode.None)
                 return;
 
-            List<Vector2Int> operatedTiles = null;
+            List<Vector2Int> operatedSelection = null;
             switch (Core.Instance.Data.operatorMode)
             {
                 case Data.OperatorMode.Hollow:
-                    operatedTiles = Hollow(newSquares);
+                    operatedSelection = Hollow(selection);
                     break;
             }
 
-            var operatedSquares = new Squares();
-            foreach (var tile in operatedTiles)
-            {
-                Transfer(newSquares, operatedSquares, tile);
-            }
-            foreach (var square in newSquares)
-            {
-                GameObject.Destroy(square.Value.gameObject);
-            }
-
-            newSquares = operatedSquares;
+            selection = operatedSelection;
         }
 
-        static List<Vector2Int> Hollow(Squares newSquares)
+        static List<Vector2Int> Hollow(List<Vector2Int> selection)
         {
-            var outsideSquares = new List<Vector2Int>();
-            foreach (var square in newSquares)
+            var outsideSelection = new List<Vector2Int>();
+            foreach (var square in selection)
             {
-                var neighbours = GetNeighbours(newSquares, square.Key);
+                var neighbours = GetNeighbours(selection, square);
                 if (neighbours.Count < 4)
                 {
-                    outsideSquares.Add(square.Key);
+                    outsideSelection.Add(square);
                 }
             }
-            return outsideSquares;
-        }
-
-        static void Transfer(Squares oldSquares, Squares newSquares, Vector2Int currentTile)
-        {
-            var newSquare = oldSquares[currentTile];
-            oldSquares.Remove(currentTile);
-            newSquares.Add(currentTile, newSquare);
+            return outsideSelection;
         }
 
         static readonly Vector2Int[] Neighbours = [
@@ -61,13 +44,13 @@ namespace WorldEditMod
             new Vector2Int(0, 1),
             new Vector2Int(0, -1),
         ];
-        static List<Vector2Int> GetNeighbours(Squares squares, Vector2Int tilePos)
+        static List<Vector2Int> GetNeighbours(List<Vector2Int> selection, Vector2Int tilePos)
         {
             var neighbours = new List<Vector2Int>();
             foreach (var neighbourDir in Neighbours)
             {
                 var neighbourPos = tilePos + neighbourDir;
-                if (squares.ContainsKey(neighbourPos))
+                if (selection.Contains(neighbourPos))
                 {
                     neighbours.Add(neighbourPos);
                 }

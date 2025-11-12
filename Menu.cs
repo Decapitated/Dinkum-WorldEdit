@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using WorldEditMod.Select;
 
 namespace WorldEditMod
 {
@@ -126,7 +127,16 @@ namespace WorldEditMod
                 {
                     data.selectMode = mode;
                     data.page = Page.Main;
-                    Core.Instance.Measure.Dirty();
+                    Core.Instance.Measure.ClearMeasurement();
+                    switch (mode)
+                    {
+                        case Data.SelectMode.Rectangle:
+                            Core.Instance.Measure.Selector = new Rectangle();
+                            break;
+                        case Data.SelectMode.Circle:
+                            Core.Instance.Measure.Selector = new Circle();
+                            break;
+                    }
                 }
             }
         }

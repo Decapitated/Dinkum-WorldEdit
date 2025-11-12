@@ -437,7 +437,10 @@
 		<Compile Include="Levelers.cs" />
 		<Compile Include="Operations.cs" />
 		<Compile Include="Patches\TapeMeasureManager_useTapeMeasure.cs" />
-		<Compile Include="Selectors.cs" />
+		<Compile Include="Select\Circle.cs" />
+		<Compile Include="Select\Rectangle.cs" />
+		<Compile Include="Select\Selector.cs" />
+		<Compile Include="Select\StartEndSelector.cs" />
 	</ItemGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
