@@ -85,7 +85,8 @@ namespace WorldEditMod
 
                     var highlightPos = GetHighlighterPosition2D();
 
-                    Selection selected = Selector.Collect(highlightPos, ShouldSkip);
+                    var selected = new Selection();
+                    yield return Selector.Collect(selected, highlightPos, ShouldSkip);
 
                     var filtered = new Selection();
                     foreach (var tile in selected)

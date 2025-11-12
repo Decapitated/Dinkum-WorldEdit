@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 namespace WorldEditMod.Select
 {
@@ -10,6 +11,6 @@ namespace WorldEditMod.Select
 
         public abstract void Use(Vector2Int pos);
         public abstract void Clear();
-        public abstract Selection Collect(Vector2Int pos, Func<Vector2Int, bool> shouldSkip);
+        public abstract IEnumerator Collect(Selection selection, Vector2Int pos, Func<Vector2Int, bool> shouldSkip);
     }
 }

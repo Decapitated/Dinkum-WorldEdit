@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -7,7 +8,7 @@ namespace WorldEditMod.Select
 {
     internal class FloodFill : Selector
     {
-        const int MAX_DISTANCE = 10;
+        const int MAX_DISTANCE = 50;
 
         Vector2Int? origin;
 
@@ -27,13 +28,14 @@ namespace WorldEditMod.Select
             origin = pos;
         }
 
-        public override Selection Collect(Vector2Int pos, Func<Vector2Int, bool> shouldSkip)
+        public override IEnumerator Collect(Selection selection, Vector2Int pos, Func<Vector2Int, bool> shouldSkip)
         {
-            var selection = new Selection();
-
             if (origin != null)
             {
+                var visited = new Selection();
                 var floodQueue = new Queue<Vector2Int>();
+
+                visited.Add((Vector2Int)origin);
                 floodQueue.Enqueue((Vector2Int)origin);
 
                 while (floodQueue.Count > 0)
@@ -46,16 +48,16 @@ namespace WorldEditMod.Select
                         var neighbours = Operations.GetNeighbours(currentTile);
                         foreach (var neighbour in neighbours)
                         {
-                            if (!selection.Contains(neighbour))
+                            if (!visited.Contains(neighbour))
                             {
+                                visited.Add(neighbour);
                                 floodQueue.Enqueue(neighbour);
                             }
                         }
                     }
                 }
             }
-
-            return selection;
+            yield break;
         }
     }
 }
