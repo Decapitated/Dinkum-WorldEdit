@@ -70,6 +70,15 @@ namespace WorldEditMod
                 }
                 GUILayout.EndHorizontal();
 
+                // Destory Tile Objects Toggle
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Destory Tile Objects");
+                if (GUILayout.Button(data.destroyTileObjects ? "Enabled" : "Disabled"))
+                {
+                    data.destroyTileObjects = !data.destroyTileObjects;
+                }
+                GUILayout.EndHorizontal();
+
                 // Operator Mode Page Toggle
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Operator");

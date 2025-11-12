@@ -18,6 +18,8 @@ namespace WorldEditMod
         internal Squares squares = [];
         bool isDirty = false;
 
+        public void Dirty() => isDirty = true;
+
         internal void UseCustomTapeMeasure()
         {
             if (Selector == null) return;
@@ -51,11 +53,6 @@ namespace WorldEditMod
                 }
             }
             squares.Clear();
-        }
-
-        public void Dirty()
-        {
-            isDirty = true;
         }
 
         internal void TransferOrAdd(Squares newSquares, Vector2Int currentTile)
@@ -123,9 +120,12 @@ namespace WorldEditMod
                 yield return null;
             }
         }
+        
         bool ShouldSkip(Vector2Int tile)
         {
             var isWater = WorldManager.Instance.waterMap[tile.x, tile.y];
+
+            if (Core.Instance.Data.ignoreWater && isWater) return true;
 
             var startY = WorldManager.Instance.heightMap[Selector.Origin.x, Selector.Origin.y];
             var tileY = WorldManager.Instance.heightMap[tile.x, tile.y];
@@ -150,7 +150,7 @@ namespace WorldEditMod
                     break;
             }
 
-            return (Core.Instance.Data.ignoreWater && isWater) || !isValidY;
+            return !isValidY;
         }
     }
 }

@@ -4,6 +4,8 @@ namespace WorldEditMod
 {
     static internal class Levelers
     {
+        private static readonly BombExplodes DummyBomb = new();
+
         static public void Level()
         {
             switch (Core.Instance.Data.levelMode)
@@ -101,6 +103,10 @@ namespace WorldEditMod
         {
             foreach (var square in Core.Instance.Measure.squares)
             {
+                if (Core.Instance.Data.destroyTileObjects && DummyBomb.shouldDestroyOnTile(square.Key.x, square.Key.y))
+                {
+                    NetworkMapSharer.Instance.RpcUpdateOnTileObject(-1, square.Key.x, square.Key.y);
+                }
                 var tileHeight = WorldManager.Instance.heightMap[square.Key.x, square.Key.y];
                 var diff = routine(tileHeight);
                 NetworkMapSharer.Instance.changeTileHeight(diff, square.Key.x, square.Key.y);

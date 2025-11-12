@@ -38,6 +38,7 @@
         public bool toggled = false;
         public SelectMode selectMode = SelectMode.Rectangle;
         public bool ignoreWater = true;
+        public bool destroyTileObjects = false;
         public LevelMode levelMode = LevelMode.Player;
         public int adjustAmount = 1;
         public OperatorMode operatorMode = OperatorMode.None;
