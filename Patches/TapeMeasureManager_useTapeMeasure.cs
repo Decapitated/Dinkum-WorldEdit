@@ -1,10 +1,6 @@
 ﻿using HarmonyLib;
 using MelonLoader;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
-using UnityEngine;
 
 namespace WorldEditMod.Patches
 {
@@ -22,7 +18,9 @@ namespace WorldEditMod.Patches
                 bool currentlyMeasuring = (bool)CurrentlyMeasuring.GetValue(__instance);
                 bool measurementSaved = (bool)MeasurementSaved.GetValue(__instance);
 
-                bool shouldBypass = (!currentlyMeasuring && !measurementSaved) && (Core.Instance.Measure.IsMeasuring || Core.Instance.Data.toggled);
+                var isMeasuring = Core.Instance.Measure.Selector != null && Core.Instance.Measure.Selector.IsMeasuring;
+
+                bool shouldBypass = (!currentlyMeasuring && !measurementSaved) && (isMeasuring || Core.Instance.Data.toggled);
                 if (!shouldBypass)
                 {
                     return true;

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using WorldEditMod.Select;
 
 namespace WorldEditMod
 {
@@ -69,6 +70,15 @@ namespace WorldEditMod
                 }
                 GUILayout.EndHorizontal();
 
+                // Destory Tile Objects Toggle
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Destory Tile Objects");
+                if (GUILayout.Button(data.destroyTileObjects ? "Enabled" : "Disabled"))
+                {
+                    data.destroyTileObjects = !data.destroyTileObjects;
+                }
+                GUILayout.EndHorizontal();
+
                 // Operator Mode Page Toggle
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Operator");
@@ -126,7 +136,16 @@ namespace WorldEditMod
                 {
                     data.selectMode = mode;
                     data.page = Page.Main;
-                    Core.Instance.Measure.Dirty();
+                    Core.Instance.Measure.ClearMeasurement();
+                    switch (mode)
+                    {
+                        case Data.SelectMode.Rectangle:
+                            Core.Instance.Measure.Selector = new Rectangle();
+                            break;
+                        case Data.SelectMode.Circle:
+                            Core.Instance.Measure.Selector = new Circle();
+                            break;
+                    }
                 }
             }
         }

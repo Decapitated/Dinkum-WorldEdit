@@ -1,52 +1,45 @@
 ﻿using MelonLoader;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
+using WorldEditMod.Select;
 
 namespace WorldEditMod
 {
     public class Measure
     {
         public bool HoldingTapeMeasure { get; private set; } = false;
-        public bool IsMeasuring { get => StartPosition != null; }
 
         internal GameObject SquarePrefab { get; set; } = null;
 
+        internal Selector Selector = new Rectangle();
+
         internal Squares squares = [];
-        internal Vector2Int? StartPosition { get; private set; } = null;
-        internal Vector2Int? EndPosition { get; private set; } = null;
         bool isDirty = false;
+
+        public void Dirty() => isDirty = true;
 
         internal void UseCustomTapeMeasure()
         {
-            var highlightPos = DivineDinkum.Utilities.GetHighlighterPosition();
-            var highlightPos2D = new Vector2Int((int)highlightPos.x, (int)highlightPos.z);
-            if (StartPosition == null)
-            {
-                StartMeasuring(highlightPos2D);
-            }
-            else if (EndPosition == null)
-            {
-                StopMeasuring(highlightPos2D);
-            }
-        }
+            if (Selector == null) return;
 
-        void StartMeasuring(Vector2Int highlightPos)
-        {
-            StartPosition = highlightPos;
-            EndPosition = null;
-            MelonCoroutines.Start(DoMeasurement());
-        }
-
-        void StopMeasuring(Vector2Int highlightPos)
-        {
-            EndPosition = highlightPos;
-            Dirty();
+            var wasMeasuring = Selector.IsMeasuring;
+            var highlightPos = GetHighlighterPosition2D();
+            Selector.Use(highlightPos);
+            if (!wasMeasuring && Selector.IsMeasuring)
+            {
+                MelonCoroutines.Start(DoMeasurement());
+            }
+            else if (Selector.IsFinished)
+            {
+                Dirty();
+            }
         }
 
         internal void ClearMeasurement()
         {
-            StartPosition = null;
-            EndPosition = null;
+            Selector.Clear();
             ClearSquares();
         }
 
@@ -60,11 +53,6 @@ namespace WorldEditMod
                 }
             }
             squares.Clear();
-        }
-
-        public void Dirty()
-        {
-            isDirty = true;
         }
 
         internal void TransferOrAdd(Squares newSquares, Vector2Int currentTile)
@@ -84,38 +72,85 @@ namespace WorldEditMod
             newSquares.Add(currentTile, newSquare);
         }
 
+        internal Vector2Int GetHighlighterPosition2D()
+        {
+            var highlightPos = DivineDinkum.Utilities.GetHighlighterPosition();
+            return new Vector2Int((int)highlightPos.x, (int)highlightPos.z);
+        }
+
         IEnumerator DoMeasurement()
         {
-            while (StartPosition != null)
+            while (Selector != null && Selector.IsMeasuring)
             {
-                if (EndPosition == null || isDirty)
+                if (!Selector.IsFinished || isDirty)
                 {
                     yield return null;
-                    Vector2Int realEndPos;
-                    if (EndPosition != null)
+
+                    var highlightPos = GetHighlighterPosition2D();
+
+                    List<Vector2Int> selected = Selector.Collect(highlightPos);
+
+                    var filtered = new List<Vector2Int>();
+                    foreach (var tile in selected)
                     {
-                        realEndPos = (Vector2Int)EndPosition;
+                        if (ShouldSkip(tile)) continue;
+                        filtered.Add(tile);
                     }
-                    else
+                    selected = filtered;
+
+                    Operations.Operate(ref selected);
+
+                    // Transfer or Add selected tiles.
+                    var newSquares = new Squares();
+                    foreach (var tile in selected)
                     {
-                        var highlightPos = DivineDinkum.Utilities.GetHighlighterPosition();
-                        realEndPos = new Vector2Int((int)highlightPos.x, (int)highlightPos.z);
+                        if (ShouldSkip(tile)) continue;
+                        TransferOrAdd(newSquares, tile);
                     }
 
-                    Squares newSquares = Selectors.Select((Vector2Int)StartPosition, realEndPos);
-
-                    Operations.Operate(ref newSquares);
-
+                    // Cleanup old squares.
                     foreach (var square in squares)
                     {
                         GameObject.Destroy(square.Value.gameObject);
                     }
+
                     squares = newSquares;
                     isDirty = false;
                 }
                 yield return null;
             }
         }
+        
+        bool ShouldSkip(Vector2Int tile)
+        {
+            var isWater = WorldManager.Instance.waterMap[tile.x, tile.y];
 
+            if (Core.Instance.Data.ignoreWater && isWater) return true;
+
+            var startY = WorldManager.Instance.heightMap[Selector.Origin.x, Selector.Origin.y];
+            var tileY = WorldManager.Instance.heightMap[tile.x, tile.y];
+            var yDiff = tileY - startY;
+            var isValidY = true;
+            switch (Core.Instance.Data.limitYMode)
+            {
+                case Data.LimitYMode.Same:
+                    isValidY = yDiff == 0;
+                    break;
+                case Data.LimitYMode.Less:
+                    isValidY = yDiff < 0;
+                    break;
+                case Data.LimitYMode.LessOrSame:
+                    isValidY = yDiff <= 0;
+                    break;
+                case Data.LimitYMode.Greater:
+                    isValidY = yDiff > 0;
+                    break;
+                case Data.LimitYMode.GreaterOrSame:
+                    isValidY = yDiff >= 0;
+                    break;
+            }
+
+            return !isValidY;
+        }
     }
 }

@@ -45,7 +45,8 @@ namespace WorldEditMod
         Rect mainWindowRect;
         public override void OnGUI()
         {
-            if (HoldingTapeMeasure || Measure.IsMeasuring)
+            var isMeasuring = Measure.Selector != null && Measure.Selector.IsMeasuring;
+            if (HoldingTapeMeasure || isMeasuring)
             {
                 mainWindowRect = GUILayout.Window(0,
                     new Rect(Screen.width - Width, Screen.height / 2.0f - Height / 2.0f, Width, Height),
