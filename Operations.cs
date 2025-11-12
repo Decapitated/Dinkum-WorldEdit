@@ -57,5 +57,16 @@ namespace WorldEditMod
             }
             return neighbours;
         }
+
+        static public Selection GetNeighbours(Vector2Int tilePos)
+        {
+            var neighbours = new Selection();
+            foreach (var neighbourDir in Neighbours)
+            {
+                var neighbourPos = tilePos + neighbourDir;
+                neighbours.Add(neighbourPos);
+            }
+            return neighbours;
+        }
     }
 }

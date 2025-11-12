@@ -5,7 +5,8 @@
         public enum SelectMode
         {
             Rectangle,
-            Circle
+            Circle,
+            Flood
         }
 
         public enum LevelMode
