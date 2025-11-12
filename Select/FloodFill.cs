@@ -25,9 +25,14 @@ namespace WorldEditMod.Select
             origin = pos;
         }
 
-        public override List<Vector2Int> Collect(Vector2Int pos, Func<Vector2Int, bool> shouldSkip)
+        public override Selection Collect(Vector2Int pos, Func<Vector2Int, bool> shouldSkip)
         {
             throw new NotImplementedException();
         }
+
+        //static void FloodFill()
+        //{
+
+        //}
     }
 }

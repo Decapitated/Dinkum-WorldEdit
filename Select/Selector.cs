@@ -10,6 +10,6 @@ namespace WorldEditMod.Select
 
         public abstract void Use(Vector2Int pos);
         public abstract void Clear();
-        public abstract List<Vector2Int> Collect(Vector2Int pos, Func<Vector2Int, bool> shouldSkip);
+        public abstract Selection Collect(Vector2Int pos, Func<Vector2Int, bool> shouldSkip);
     }
 }

@@ -4,9 +4,9 @@ namespace WorldEditMod.Select
 {
     internal class Circle : StartEndSelector
     {
-        public override List<Vector2Int> Collect(Vector2Int pos, Func<Vector2Int, bool> shouldSkip)
+        public override Selection Collect(Vector2Int pos, Func<Vector2Int, bool> shouldSkip)
         {
-            var selection = new List<Vector2Int>();
+            var selection = new Selection();
             if (IsMeasuring)
             {
                 var realEnd = end ?? pos;

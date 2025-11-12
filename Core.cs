@@ -1,5 +1,6 @@
 ﻿global using Squares = System.Collections.Generic.Dictionary<UnityEngine.Vector2Int, TapeMeasureSquare>;
 global using Square = System.Collections.Generic.KeyValuePair<UnityEngine.Vector2Int, TapeMeasureSquare>;
+global using Selection = System.Collections.Generic.HashSet<UnityEngine.Vector2Int>;
 
 using MelonLoader;
 using System.Collections;

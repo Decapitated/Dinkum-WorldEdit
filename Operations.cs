@@ -8,12 +8,12 @@ namespace WorldEditMod
 {
     static internal class Operations
     {
-        static public void Operate(ref List<Vector2Int> selection)
+        static public void Operate(ref Selection selection)
         {
             if (Core.Instance.Data.operatorMode == Data.OperatorMode.None)
                 return;
 
-            List<Vector2Int> operatedSelection = null;
+            Selection operatedSelection = null;
             switch (Core.Instance.Data.operatorMode)
             {
                 case Data.OperatorMode.Hollow:
@@ -24,9 +24,9 @@ namespace WorldEditMod
             selection = operatedSelection;
         }
 
-        static List<Vector2Int> Hollow(List<Vector2Int> selection)
+        static Selection Hollow(Selection selection)
         {
-            var outsideSelection = new List<Vector2Int>();
+            var outsideSelection = new Selection();
             foreach (var square in selection)
             {
                 var neighbours = GetNeighbours(selection, square);
@@ -44,9 +44,9 @@ namespace WorldEditMod
             new Vector2Int(0, 1),
             new Vector2Int(0, -1),
         ];
-        static List<Vector2Int> GetNeighbours(List<Vector2Int> selection, Vector2Int tilePos)
+        static public Selection GetNeighbours(Selection selection, Vector2Int tilePos)
         {
-            var neighbours = new List<Vector2Int>();
+            var neighbours = new Selection();
             foreach (var neighbourDir in Neighbours)
             {
                 var neighbourPos = tilePos + neighbourDir;
