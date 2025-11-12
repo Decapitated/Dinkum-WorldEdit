@@ -438,6 +438,7 @@
 		<Compile Include="Operations.cs" />
 		<Compile Include="Patches\TapeMeasureManager_useTapeMeasure.cs" />
 		<Compile Include="Select\Circle.cs" />
+		<Compile Include="Select\FloodFill.cs" />
 		<Compile Include="Select\Rectangle.cs" />
 		<Compile Include="Select\Selector.cs" />
 		<Compile Include="Select\StartEndSelector.cs" />

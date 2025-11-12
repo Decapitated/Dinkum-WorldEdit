@@ -4,7 +4,7 @@ namespace WorldEditMod.Select
 {
     internal class Rectangle : StartEndSelector
     {
-        public override List<Vector2Int> Collect(Vector2Int pos)
+        public override List<Vector2Int> Collect(Vector2Int pos, Func<Vector2Int, bool> shouldSkip)
         {
             var selection = new List<Vector2Int>();
             if (IsMeasuring)
@@ -20,7 +20,10 @@ namespace WorldEditMod.Select
                     for (int x = 0; x <= Mathf.Abs(diff.x); x++)
                     {
                         var currentTile = (Vector2Int)start + new Vector2Int(x * xDir, z * zDir);
-                        selection.Add(currentTile);
+                        if (!shouldSkip(currentTile))
+                        {
+                            selection.Add(currentTile);
+                        }
                     }
                 }
             }
