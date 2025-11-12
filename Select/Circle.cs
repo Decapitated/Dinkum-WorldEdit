@@ -1,12 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 namespace WorldEditMod.Select
 {
     internal class Circle : StartEndSelector
     {
-        public override List<Vector2Int> Collect(Vector2Int pos)
+        public override IEnumerator Collect(Selection selection, Vector2Int pos, Func<Vector2Int, bool> shouldSkip)
         {
-            var selection = new List<Vector2Int>();
             if (IsMeasuring)
             {
                 var realEnd = end ?? pos;
@@ -36,12 +36,15 @@ namespace WorldEditMod.Select
                             var currentTile = new Vector2Int(
                                 ((Vector2Int)start).x + x,
                                 ((Vector2Int)start).y + z);
-                            selection.Add(currentTile);
+                            if (!shouldSkip(currentTile))
+                            {
+                                selection.Add(currentTile);
+                            }
                         }
                     }
                 }
             }
-            return selection;
+            yield break;
         }
     }
 }

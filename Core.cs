@@ -1,5 +1,6 @@
 ﻿global using Squares = System.Collections.Generic.Dictionary<UnityEngine.Vector2Int, TapeMeasureSquare>;
 global using Square = System.Collections.Generic.KeyValuePair<UnityEngine.Vector2Int, TapeMeasureSquare>;
+global using Selection = System.Collections.Generic.HashSet<UnityEngine.Vector2Int>;
 
 using MelonLoader;
 using System.Collections;
@@ -14,8 +15,6 @@ namespace WorldEditMod
     public class Core : MelonMod
     {
         static public Core Instance { get; private set; }
-
-        //static public MaterialPropertyBlock MPB { get; private set; }
 
         public bool HoldingTapeMeasure { get; private set; } = false;
         public Measure Measure {  get; private set; } = new Measure();

@@ -145,6 +145,9 @@ namespace WorldEditMod
                         case Data.SelectMode.Circle:
                             Core.Instance.Measure.Selector = new Circle();
                             break;
+                        case Data.SelectMode.Flood:
+                            Core.Instance.Measure.Selector = new FloodFill();
+                            break;
                     }
                 }
             }

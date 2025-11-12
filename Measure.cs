@@ -31,10 +31,7 @@ namespace WorldEditMod
             {
                 MelonCoroutines.Start(DoMeasurement());
             }
-            else if (Selector.IsFinished)
-            {
-                Dirty();
-            }
+            Dirty();
         }
 
         internal void ClearMeasurement()
@@ -88,9 +85,10 @@ namespace WorldEditMod
 
                     var highlightPos = GetHighlighterPosition2D();
 
-                    List<Vector2Int> selected = Selector.Collect(highlightPos);
+                    var selected = new Selection();
+                    yield return Selector.Collect(selected, highlightPos, ShouldSkip);
 
-                    var filtered = new List<Vector2Int>();
+                    var filtered = new Selection();
                     foreach (var tile in selected)
                     {
                         if (ShouldSkip(tile)) continue;
@@ -104,7 +102,6 @@ namespace WorldEditMod
                     var newSquares = new Squares();
                     foreach (var tile in selected)
                     {
-                        if (ShouldSkip(tile)) continue;
                         TransferOrAdd(newSquares, tile);
                     }
 
