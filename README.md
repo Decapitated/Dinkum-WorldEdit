@@ -2,6 +2,11 @@
 
 A mod that adds the capability to do large changes to the landscape.
 
+## Requirements
+- Dinkum v1.0.7
+- [MelonLoader v0.7.1 Beta](https://github.com/LavaGang/MelonLoader)
+- [DivineDinkum](https://github.com/Decapitated/DivineDinkum) v1.0.0
+
 ## Features
 
 ### Selection Modes
@@ -38,11 +43,6 @@ Destory tile objects when leveling using built-in game methods to preserve thing
 |-|-|
 | <img src="docs/LevelBefore.png"> | <img src="docs/LevelAfter.png"> |
 
-
-## Requirements
-- Dinkum v1.0.7
-- [MelonLoader v0.7.1 Beta](https://github.com/LavaGang/MelonLoader)
-- [DivineDinkum](https://github.com/Decapitated/DivineDinkum) v1.0.0
 
 ## To-Do
 - Improved UI
