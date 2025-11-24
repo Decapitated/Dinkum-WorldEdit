@@ -43,3 +43,8 @@ Destory tile objects when leveling using built-in game methods to preserve thing
 - Dinkum v1.0.7
 - [MelonLoader v0.7.1 Beta](https://github.com/LavaGang/MelonLoader)
 - [DivineDinkum](https://github.com/Decapitated/DivineDinkum) v1.0.0
+
+## To-Do
+- Improved UI
+- Change ground type
+- Add paths
