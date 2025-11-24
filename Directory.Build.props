@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <DinkumPath><!-- C:\Absolute\Path\To\Dinkum --></DinkumPath>
+  </PropertyGroup>
+</Project>
