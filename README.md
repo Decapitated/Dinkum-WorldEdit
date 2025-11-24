@@ -54,6 +54,7 @@ Destory tile objects when leveling using built-in game methods to preserve thing
 5. Deselect with the Interact Button; Right Click for Mouse & Keyboard, Left Trigger for Controller.
 
 ## To-Do
+- Create Nexus mod page. Add mod page link to Github.
 - Improved UI
 - Change ground type
 - Add paths
