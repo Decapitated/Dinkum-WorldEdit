@@ -46,6 +46,13 @@ Destory tile objects when leveling using built-in game methods to preserve thing
 ### Hollow Selection
 <img src="docs/Hollow.png">
 
+## How To Use
+1. Equip a Tape Measure.
+2. Enable the mod by clicking the button in the menu.
+3. Select the desired area. (Use Button; Left Click for Mouse & Keyboard, Right Trigger for Controller)
+4. Click `Level` in the menu.
+5. Deselect with the Interact Button; Right Click for Mouse & Keyboard, Left Trigger for Controller.
+
 ## To-Do
 - Improved UI
 - Change ground type
