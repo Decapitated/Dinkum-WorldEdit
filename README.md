@@ -31,18 +31,20 @@ A mod that adds the capability to do large changes to the landscape.
 |-|-|
 | <img src="docs/IgnoreWaterEnabled.png"> | <img src="docs/IgnoreWaterDisabled.png"> |
 
-## Levelers:
+### Levelers:
   - Player - Levels to the same height as the player.
   - Max/Min/Avg - Level to the highest/lowest/average height of the selection.
   - Up/Down - Increase/Decrease the height of the selection at specified increments.
 
-## Safe Destroy
+### Safe Destroy
 Destory tile objects when leveling using built-in game methods to preserve things that should not be destroyed.
 
 | Before | After |
 |-|-|
 | <img src="docs/LevelBefore.png"> | <img src="docs/LevelAfter.png"> |
 
+### Hollow Selection
+<img src="docs/Hollow.png">
 
 ## To-Do
 - Improved UI
