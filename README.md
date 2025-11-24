@@ -37,3 +37,9 @@ Destory tile objects when leveling using built-in game methods to preserve thing
 | Before | After |
 |-|-|
 | <img src="docs/LevelBefore.png"> | <img src="docs/LevelAfter.png"> |
+
+
+## Requirements
+- Dinkum v1.0.7
+- [MelonLoader v0.7.1 Beta](https://github.com/LavaGang/MelonLoader)
+- [DivineDinkum](https://github.com/Decapitated/DivineDinkum) v1.0.0
