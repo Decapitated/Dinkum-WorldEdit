@@ -124,6 +124,17 @@ namespace WorldEditMod
 
             if (Core.Instance.Data.ignoreWater && isWater) return true;
 
+            var onTile = WorldManager.Instance.onTileMap[tile.x, tile.y];
+            // -4 = Bottom? edge of multi-tile object
+            // -3 = Left? edge of multi-tile object
+            // -2 = The rest of the multi-tile object
+            if (onTile < -1) return true;
+            if(onTile > -1)
+            {
+                var isMultiTileObject = WorldManager.Instance.allObjectSettings[onTile].isMultiTileObject;
+                if (isMultiTileObject) return true;
+            }
+
             var startY = WorldManager.Instance.heightMap[Selector.Origin.x, Selector.Origin.y];
             var tileY = WorldManager.Instance.heightMap[tile.x, tile.y];
             var yDiff = tileY - startY;
