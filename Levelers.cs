@@ -1,4 +1,9 @@
-﻿using UnityEngine;
+﻿using HarmonyLib;
+using MelonLoader;
+using System.Reflection;
+using UnityEngine;
+using UnityEngine.Tilemaps;
+using UnityEngine.UIElements;
 
 namespace WorldEditMod
 {
@@ -99,17 +104,48 @@ namespace WorldEditMod
             });
         }
 
+        static readonly MethodInfo FindBuildingToBeMoved = AccessTools.Method(typeof(BuildingManager), "findBuildingToMoveById");
+        static readonly MethodInfo MoveBuildingToNewPos = AccessTools.Method("MoveableBuilding:moveBuildingToNewPos");
         static void CallOnSquares(Func<int, int> routine)
         {
+            // Track moved buildings. And update multi-tile tiles to main height at end.
+            //var movedBuildings = new HashSet<int>();
             foreach (var square in Core.Instance.Measure.squares)
             {
                 if (Core.Instance.Data.destroyTileObjects && DummyBomb.shouldDestroyOnTile(square.Key.x, square.Key.y))
                 {
                     NetworkMapSharer.Instance.RpcUpdateOnTileObject(-1, square.Key.x, square.Key.y);
                 }
-                var tileHeight = WorldManager.Instance.heightMap[square.Key.x, square.Key.y];
+
+                var onTile = WorldManager.Instance.onTileMap[square.Key.x, square.Key.y];
+                var isMultiTileObject = onTile > -1 && WorldManager.Instance.allObjectSettings[onTile].isMultiTileObject;
+                if (isMultiTileObject)
+                {
+                    Melon<Core>.Logger.Msg("Removing building.");
+                    NetworkMapSharer.Instance.RpcClearHouseForMove(square.Key.x, square.Key.y);
+                    NetworkMapSharer.Instance.RpcRemoveMultiTiledObject(onTile, square.Key.x, square.Key.y, WorldManager.Instance.rotationMap[square.Key.x, square.Key.y]);
+                }
+
+                    var tileHeight = WorldManager.Instance.heightMap[square.Key.x, square.Key.y];
                 var diff = routine(tileHeight);
                 NetworkMapSharer.Instance.changeTileHeight(diff, square.Key.x, square.Key.y);
+
+                //tileHeight += diff;
+
+                // Check if Building. If so, move.
+                if (FindBuildingToBeMoved != null)
+                {
+                    if (MoveBuildingToNewPos != null)
+                    {
+                        if (isMultiTileObject)
+                        {
+                            Melon<Core>.Logger.Msg("Placing building.");
+                            //var building = FindBuildingToBeMoved.Invoke(BuildingManager.manage, [onTile]);
+                            //MoveBuildingToNewPos.Invoke(building, [square.Key.x, square.Key.y]);
+                            NetworkMapSharer.Instance.RpcUpdateOnTileObject(onTile, square.Key.x, square.Key.y);
+                        }
+                    } else { Melon<Core>.Logger.Error("MoveBuildingToNewPos is null."); }
+                } else { Melon<Core>.Logger.Error("FindBuildingToBeMoved is null.");  }
             }
         }
     }
